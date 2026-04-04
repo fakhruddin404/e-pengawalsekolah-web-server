@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Pengawal;
 use App\Models\PentadbirSekolah;
+use App\Models\LokasiTitikSemak;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
