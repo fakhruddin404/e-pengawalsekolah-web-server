@@ -41,11 +41,6 @@ class DatabaseSeeder extends Seeder
             
         });
 
-        User::factory(5)->create(['role' => 'pentadbir'])->each(function ($user) {
-
-            LokasiTitikSemak::factory()->create([
-            ]);
-            
-        });
+        LokasiTitikSemak::factory(5)->create();
     }
 }
