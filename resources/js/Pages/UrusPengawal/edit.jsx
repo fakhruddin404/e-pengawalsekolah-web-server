@@ -124,7 +124,7 @@ export default function Edit({ auth, pengawal }) {
                                     value={data.fld_pgw_noIC}
                                     className="mt-1 block w-full bg-gray-50 border-gray-100"
                                     onChange={(e) => {
-                                        let value = e.target.value.replace(/\D/g, ''); 
+                                        let value = e.target.value.replace(/\D/g, '');
 
                                         if (value.length > 6 && value.length <= 8) {
                                             value = `${value.slice(0, 6)}-${value.slice(6)}`;

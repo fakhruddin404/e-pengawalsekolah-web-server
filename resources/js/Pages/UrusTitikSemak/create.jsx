@@ -54,7 +54,7 @@ export default function Create({ auth, nextId }) {
 
     const submit = (e) => {
         e.preventDefault();
-        
+
         // Pastikan latitud & longitud telah dipilih
         if (!data.fld_loc_latitud || !data.fld_loc_longitud) {
             alert('Sila klik pada peta untuk menetapkan lokasi (Pin) titik semak.');
@@ -82,7 +82,7 @@ export default function Create({ auth, nextId }) {
 
                 <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
                     <form onSubmit={submit} className="space-y-6">
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                             {/* ID Lokasi */}
                             <div>
