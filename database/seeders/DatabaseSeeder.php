@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Pengawal;
 use App\Models\PentadbirSekolah;
+use App\Models\LokasiTitikSemak;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -43,7 +44,6 @@ class DatabaseSeeder extends Seeder
         User::factory(5)->create(['role' => 'pentadbir'])->each(function ($user) {
 
             LokasiTitikSemak::factory()->create([
-                'user_id' => $user->id,
             ]);
             
         });
