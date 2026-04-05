@@ -17,8 +17,8 @@ L.Icon.Default.mergeOptions({
 });
 
 export default function Index({ auth, titikSemaks }) {
-    const defaultCenter = titikSemaks?.length > 0 
-        ? [(titikSemaks[0].fld_loc_latitud), (titikSemaks[0].fld_loc_longitud)] 
+    const defaultCenter = titikSemaks?.length > 0
+        ? [(titikSemaks[0].fld_loc_latitud), (titikSemaks[0].fld_loc_longitud)]
         : [3.073850, 101.607420];
 
     const deleteTitikSemak = (item) => {
@@ -30,8 +30,8 @@ export default function Index({ auth, titikSemaks }) {
         }
     };
 
-    const muatTurunQR = (item) => {
-        window.location.href = route('pentadbir.titik-semak.muat-turun-qr', item.fld_loc_id);
+    const cetakQR = (item) => {
+        window.open(route('pentadbir.titik-semak.cetak-qr', item.fld_loc_id), '_blank');
     };
 
     return (
@@ -43,7 +43,7 @@ export default function Index({ auth, titikSemaks }) {
             <Head title="Senarai Titik Semak" />
 
             <div className="w-full space-y-6">
-                
+
                 {/* Header */}
                 <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex items-center justify-between">
                     <div>
@@ -69,8 +69,8 @@ export default function Index({ auth, titikSemaks }) {
                         />
                         {/* 3. BAIKI: Tambah ejaan betul fld_loc_longitud & parseFloat */}
                         {titikSemaks?.map((titik) => (
-                            <Marker 
-                                key={titik.fld_loc_id} 
+                            <Marker
+                                key={titik.fld_loc_id}
                                 position={[titik.fld_loc_latitud, titik.fld_loc_longitud]}
                             >
                                 <Popup>
@@ -107,14 +107,14 @@ export default function Index({ auth, titikSemaks }) {
                                             <td className="px-4 py-4">{item.fld_loc_longitud}</td> {/* BAIKI: fld_loc_longitud */}
                                             <td className="px-4 py-4">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <button 
-                                                        onClick={() => muatTurunQR(item)}
-                                                        className="flex items-center justify-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-[#007bff] hover:bg-blue-600 rounded-full transition-colors"
+                                                    <button
+                                                        onClick={() => cetakQR(item)}
+                                                        className="flex items-center justify-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-teal-500 hover:bg-teal-600 rounded-full transition-colors shadow-sm"
                                                     >
-                                                        Muat Turun
-                                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                                        Cetak QR
+                                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                                                     </button>
-                                                    <button 
+                                                    <button
                                                         onClick={() => deleteTitikSemak(item)}
                                                         className="flex items-center justify-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-[#ff4d4f] hover:bg-red-600 rounded-full transition-colors"
                                                     >

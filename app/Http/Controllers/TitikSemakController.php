@@ -17,8 +17,8 @@ class TitikSemakController extends Controller
     {
         $titikSemaks = LokasiTitikSemak::latest()->get();
             
-        // Gunakan huruf besar untuk nama fail jika di React failnya adalah Index.jsx
-        return Inertia::render('UrusTitikSemak/Index', [ 
+        // Gunakan huruf kecil untuk selaras dengan nama fail index.jsx
+        return Inertia::render('UrusTitikSemak/index', [ 
             'titikSemaks' => $titikSemaks
         ]);
     }
@@ -30,8 +30,8 @@ class TitikSemakController extends Controller
     {
         $nextId = LokasiTitikSemak::generateLTSId();
         
-        // Gunakan huruf besar untuk nama fail jika di React failnya adalah Create.jsx
-        return Inertia::render('UrusTitikSemak/Create', [
+        // Gunakan huruf kecil untuk selaras dengan nama fail create.jsx
+        return Inertia::render('UrusTitikSemak/create', [
             'nextId' => $nextId
         ]);
     }
@@ -42,11 +42,10 @@ class TitikSemakController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            // Guna nama table yang betul: lokasi_titik_semaks
             'fld_loc_id' => 'required|string|unique:lokasi_titik_semaks,fld_loc_id|max:255',
             'fld_loc_nama' => 'required|string|max:255',
-            'fld_loc_latitud' => 'required|numeric',  // Ejaan dibetulkan
-            'fld_loc_longitud' => 'required|numeric', // Ejaan dibetulkan
+            'fld_loc_latitud' => 'required|numeric', 
+            'fld_loc_longitud' => 'required|numeric', 
             'fld_loc_status' => 'required|in:aktif,tidak_aktif',
         ]);
 
@@ -74,22 +73,27 @@ class TitikSemakController extends Controller
     }
 
     /**
-     * Fungsi khas untuk memuat turun Kod QR
+     * Paparkan view Cetak QR Code
      */
-    public function muatTurunQR($id)
+    public function cetakQR($id)
     {
         $titikSemak = LokasiTitikSemak::findOrFail($id);
         
-        // Jana imej QR menggunakan kod rahsia dari database
-        $qrImage = QrCode::format('png')
+        // Data berbentuk JSON untuk dibaca oleh aplikasi mudah alih
+        $qrData = json_encode([
+            'id' => $titikSemak->fld_loc_id,
+            'secret' => $titikSemak->fld_loc_kodQR
+        ]);
+
+        // Jana imej QR berbentuk SVG (untuk dirender dengan cantik ketika print)
+        $qrSvg = (string) QrCode::format('svg')
                   ->size(300)
-                  ->margin(1)
-                  ->generate($titikSemak->fld_loc_kodQR);
+                  ->margin(0)
+                  ->generate($qrData);
                   
-        $fileName = 'QR_' . $titikSemak->fld_loc_id . '.png';
-        
-        return response($qrImage)
-            ->header('Content-type', 'image/png')
-            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+        return Inertia::render('UrusTitikSemak/PrintQR', [
+            'titikSemak' => $titikSemak,
+            'qrSvg' => $qrSvg
+        ]);
     }
 }

@@ -51,7 +51,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/titik-semak/create', [TitikSemakController::class, 'create'])->name('titik-semak.create');
         Route::post('/titik-semak', [TitikSemakController::class, 'store'])->name('titik-semak.store');
         Route::delete('/titik-semak/{titikSemak}', [TitikSemakController::class, 'destroy'])->name('titik-semak.destroy');
-        Route::get('/titik-semak/{titikSemak}/muat-turun-qr', [TitikSemakController::class, 'muatTurunQR'])->name('titik-semak.muat-turun-qr');
+        Route::get('/titik-semak/{titikSemak}/cetak-qr', [TitikSemakController::class, 'cetakQR'])->name('titik-semak.cetak-qr');
         });
 
     // profile;
