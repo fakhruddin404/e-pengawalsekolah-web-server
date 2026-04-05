@@ -52,6 +52,9 @@ class TitikSemakController extends Controller
         // Jana kod rahsia rawak (30 aksara) untuk imej QR
         $validated['fld_loc_kodQR'] = Str::random(30);
 
+        // Tukar status string ('aktif' / 'tidak_aktif') kepada boolean (1 / 0) untuk database
+        $validated['fld_loc_status'] = $validated['fld_loc_status'] === 'aktif' ? 1 : 0;
+
         // Simpan semua data ke database (termasuk status dan kod QR)
         LokasiTitikSemak::create($validated);
 
