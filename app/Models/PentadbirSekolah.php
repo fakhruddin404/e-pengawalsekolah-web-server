@@ -32,5 +32,19 @@ class PentadbirSekolah extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public static function generatePsId()
+    {
+        $lastPentadbir = self::orderBy('fld_ps_id', 'desc')->first();
+
+        if (!$lastPentadbir) {
+            return 'PS-001';
+        }
+
+        $lastNumber = (int) str_replace('PS-', '', $lastPentadbir->fld_ps_id);
+        $newNumber = $lastNumber + 1;
+
+        return 'PS-' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+    }
 }
 

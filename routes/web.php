@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PengawalController;
 use App\Http\Controllers\TitikSemakController;  
+use App\Http\Controllers\PelawatController;
+use App\Http\Controllers\PentadbirController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -16,20 +18,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // --- Traffic Controller ---
     Route::get('/dashboard', function () {
         return match (auth()->user()->role) {
-            'admin'     => redirect()->route('admin.dashboard'),
+            'admin'     => redirect()->route('admin.pentadbir.index'),
             'pentadbir' => redirect()->route('pentadbir.dashboard'),
             default     => abort(403, 'Akses ditolak. Peranan tidak sah.'),
         };
     })->name('dashboard');
 
     Route::prefix('admin')->name('admin.')->group(function () {
-        
-        Route::get('/dashboard', function () {
-            return Inertia::render('DashboardAdmin', ['role' => 'admin']);
-        })->name('dashboard');
-        
-        // Letak route khas admin lain di sini pada masa akan datang
-        // Route::get('/tetapan', ...)->name('tetapan');
+
+        // urus pentadbir;
+        Route::get('urus-pentadbir', [PentadbirController::class, 'index'])->name('pentadbir.index');
+        Route::get('urus-pentadbir/tambah', [PentadbirController::class, 'create'])->name('pentadbir.create');
+        Route::post('urus-pentadbir', [PentadbirController::class, 'store'])->name('pentadbir.store');
+        Route::get('urus-pentadbir/{pentadbir}/edit', [PentadbirController::class, 'edit'])->name('pentadbir.edit');
+        Route::put('urus-pentadbir/{pentadbir}', [PentadbirController::class, 'update'])->name('pentadbir.update');
+        Route::delete('urus-pentadbir/{pentadbir}', [PentadbirController::class, 'destroy'])->name('pentadbir.destroy');
     });
 
     Route::prefix('pentadbir')->name('pentadbir.')->group(function () {
@@ -45,6 +48,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('urus-pengawal/{pengawal}/edit', [PengawalController::class, 'edit'])->name('pengawal.edit');
         Route::put('urus-pengawal/{pengawal}', [PengawalController::class, 'update'])->name('pengawal.update');
         Route::delete('urus-pengawal/{pengawal}', [PengawalController::class, 'destroy'])->name('pengawal.destroy');
+
+        // urus pelawat;
+        Route::get('urus-pelawat', [PelawatController::class, 'index'])->name('pelawat.index');
+        Route::get('urus-pelawat/{pelawat}/edit', [PelawatController::class, 'edit'])->name('pelawat.edit');
+        Route::put('urus-pelawat/{pelawat}', [PelawatController::class, 'update'])->name('pelawat.update');
+        Route::delete('urus-pelawat/{pelawat}', [PelawatController::class, 'destroy'])->name('pelawat.destroy');
 
         // urus titik semak;
         Route::get('/titik-semak', [TitikSemakController::class, 'index'])->name('titik-semak.index');
