@@ -42,5 +42,10 @@ class DatabaseSeeder extends Seeder
         });
 
         LokasiTitikSemak::factory(5)->create();
+
+        $this->call([
+            LaporanKejadianSeeder::class,
+            PelawatSeeder::class,
+        ]);
     }
 }
