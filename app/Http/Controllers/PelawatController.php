@@ -30,21 +30,6 @@ class PelawatController extends Controller
             'fld_vis_statusSenaraiHitam' => 'required|boolean',
         ]);
 
-        $namaImej = null;
-
-        if ($request->hasFile('fld_vis_urlGambarWajah')) {
-            if ($pelawat->fld_vis_urlGambarWajah) {
-                $pathGambarLama = public_path('pelawatImej/' . $pelawat->fld_vis_urlGambarWajah);
-                if (file_exists($pathGambarLama)) {
-                    unlink($pathGambarLama);
-                }
-            }
-
-            $imej = $request->file('fld_vis_urlGambarWajah');
-            $namaImej = $pelawat->fld_vis_id . '_' . time() . '.' . $imej->getClientOriginalExtension();
-            $imej->move(public_path('pelawatImej'), $namaImej);
-        }
-
         $updateData = [
             'fld_vis_statusSenaraiHitam' => $validated['fld_vis_statusSenaraiHitam'],
         ];
@@ -64,6 +49,8 @@ class PelawatController extends Controller
         }
         $pelawat->delete();
 
-        return redirect()->route('pentadbir.pelawat.index')->with('success', 'Pelawat berjaya dipadam.');
+        return redirect()
+        ->route('pentadbir.pelawat.index')
+        ->with('success', 'Pelawat berjaya dipadam.');
     }
 }

@@ -28,10 +28,10 @@ return new class extends Migration
             $table->decimal('fld_rpt_longitud', 10, 7);
 
             $table->enum('fld_rpt_status', [
-                'baru',
-                'dalam_siasatan',
-                'selesai'
-            ])->default('baru');
+                'Baru',
+                'Dalam Siasatan',
+                'Selesai'
+            ])->default('Baru');
 
             $table->timestamps();
 

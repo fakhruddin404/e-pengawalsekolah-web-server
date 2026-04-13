@@ -5,6 +5,7 @@ use App\Http\Controllers\PengawalController;
 use App\Http\Controllers\TitikSemakController;  
 use App\Http\Controllers\PelawatController;
 use App\Http\Controllers\PentadbirController;
+use App\Http\Controllers\LaporanKejadianController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -61,6 +62,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/titik-semak', [TitikSemakController::class, 'store'])->name('titik-semak.store');
         Route::delete('/titik-semak/{titikSemak}', [TitikSemakController::class, 'destroy'])->name('titik-semak.destroy');
         Route::get('/titik-semak/{titikSemak}/cetak-qr', [TitikSemakController::class, 'cetakQR'])->name('titik-semak.cetak-qr');
+
+        // urus laporan kejadian (RUD);
+        Route::get('/laporan-kejadian', [LaporanKejadianController::class, 'index'])->name('laporan-kejadian.index');
+        Route::get('/laporan-kejadian/{laporanKejadian}', [LaporanKejadianController::class, 'show'])->name('laporan-kejadian.show');
+        Route::get('/laporan-kejadian/{laporanKejadian}/edit', [LaporanKejadianController::class, 'edit'])->name('laporan-kejadian.edit');
+        Route::put('/laporan-kejadian/{laporanKejadian}', [LaporanKejadianController::class, 'update'])->name('laporan-kejadian.update');
+        Route::delete('/laporan-kejadian/{laporanKejadian}', [LaporanKejadianController::class, 'destroy'])->name('laporan-kejadian.destroy');
         });
 
     // profile;
