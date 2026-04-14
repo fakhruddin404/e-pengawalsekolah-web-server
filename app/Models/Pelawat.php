@@ -23,6 +23,11 @@ class Pelawat extends Model
         'fld_vis_statusSenaraiHitam',
     ];
 
+    public function pasLawatans(): HasMany
+    {
+        return $this->hasMany(PasLawatan::class, 'fld_vis_id', 'fld_vis_id');
+    }
+
     public static function generateVisId()
     {
         // Susun mengikut susunan ID (Primary Key) menurun untuk dapatkan yang terakhir dengan tepat

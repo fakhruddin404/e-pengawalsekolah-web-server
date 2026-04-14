@@ -28,6 +28,11 @@ class PasLawatan extends Model
     {
         return $this->belongsTo(Pengawal::class, 'fld_pgw_idPengawal', 'fld_pgw_id');
     }
+    
+    public function pelawat(): BelongsTo
+    {
+        return $this->belongsTo(Pelawat::class, 'fld_vis_id', 'fld_vis_id');
+    }
 
     public static function generatePasId()
     {

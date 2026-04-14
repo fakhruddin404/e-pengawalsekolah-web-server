@@ -21,7 +21,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return match (auth()->user()->role) {
             'admin'     => redirect()->route('admin.pentadbir.index'),
-            'pentadbir' => redirect()->route('pentadbir.dashboard'),
+            'pentadbir' => redirect()->route('pentadbir.pengawal.index'),
             default     => abort(403, 'Akses ditolak. Peranan tidak sah.'),
         };
     })->name('dashboard');
@@ -39,6 +39,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::prefix('pentadbir')->name('pentadbir.')->group(function () {
         
+        // dashboardRosak;
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
         // urus pengawal;
