@@ -16,11 +16,23 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             cd /var/www/e_pengawalsekolah
-            git pull origin main
+            # 1. Paksa buang sebarang perubahan local supaya git pull tak sangkut
+            git fetch --all
+            git reset --hard origin/main
+            
+            # 2. Update dependencies
             composer install --no-dev --optimize-autoloader
+            
+            # 3. Build frontend (Gunakan sudo jika perlu)
             npm install
             npm run build
+            
+            # 4. Database & Cache Management
             php artisan migrate --force
+            php artisan optimize:clear
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
+            
+            # 5. Reset permission supaya Nginx boleh baca fail baru
+            sudo chown -R www-data:www-data storage bootstrap/cache public/build
