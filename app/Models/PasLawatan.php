@@ -23,4 +23,24 @@ class PasLawatan extends Model
         'fld_pas_masaKeluar',
         'fld_pas_statusPas',
     ];
+
+    public function pengawal(): BelongsTo
+    {
+        return $this->belongsTo(Pengawal::class, 'fld_pgw_idPengawal', 'fld_pgw_id');
+    }
+
+    public static function generatePasId()
+    {
+        // Susun mengikut susunan ID (Primary Key) menurun untuk dapatkan yang terakhir dengan tepat
+        $lastPasLawatan = self::orderBy('fld_pas_idPas', 'desc')->first();
+
+        if (!$lastPasLawatan) {
+            return 'PAS-001';
+        }
+
+        $lastNumber = (int) str_replace('PAS-', '', $lastPasLawatan->fld_pas_idPas);
+        $newNumber = $lastNumber + 1;
+
+        return 'PAS-' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+    }
 }

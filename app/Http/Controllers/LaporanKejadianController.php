@@ -19,7 +19,7 @@ class LaporanKejadianController extends Controller
         ]);
     }
 
-/*    public function show(LaporanKejadian $laporanKejadian)
+/*  public function show(LaporanKejadian $laporanKejadian)
     {
         $laporanKejadian->load(['pengawal.user']);
 
@@ -40,16 +40,13 @@ class LaporanKejadianController extends Controller
     public function update(Request $request, LaporanKejadian $laporanKejadian)
     {
         $validated = $request->validate([
-            'fld_rpt_kategori' => 'required|string|max:255',
-            'fld_rpt_keterangan' => 'required|string',
-            'fld_rpt_tarikhMasa' => 'required|date',
             'fld_rpt_status' => 'required|in:baru,dalam_siasatan,selesai',
         ]);
 
         $laporanKejadian->update($validated);
 
         return redirect()
-            ->route('pentadbir.laporan-kejadian.show', $laporanKejadian)
+            ->route('pentadbir.laporan-kejadian.index', $laporanKejadian)
             ->with('success', 'Laporan kejadian berjaya dikemaskini.');
     }
 

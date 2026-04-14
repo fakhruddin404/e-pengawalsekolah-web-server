@@ -8,7 +8,7 @@ const getStatusBadge = (status) => {
             return <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Aktif</span>;
         case 'nyahaktif':
             return <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">Nyahaktif</span>;
-        case 'tidak aktif':
+        case 'tidak_aktif':
             return <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">Tidak aktif</span>;
         default:
             return <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">Tiada Status</span>;

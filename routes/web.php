@@ -6,6 +6,7 @@ use App\Http\Controllers\TitikSemakController;
 use App\Http\Controllers\PelawatController;
 use App\Http\Controllers\PentadbirController;
 use App\Http\Controllers\LaporanKejadianController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -38,9 +39,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::prefix('pentadbir')->name('pentadbir.')->group(function () {
         
-        Route::get('/dashboard', function () {
-            return Inertia::render('DashboardPentadbir', ['role' => 'pentadbir']);
-        })->name('dashboard'); 
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
         // urus pengawal;
         Route::get('urus-pengawal', [PengawalController::class, 'index'])->name('pengawal.index');

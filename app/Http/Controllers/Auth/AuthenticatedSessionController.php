@@ -33,19 +33,21 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // 1. Get the currently logged-in user
         $user = $request->user();
 
-        // 2. Redirect based on their role 
         if ($user->role === 'admin') {
-            return redirect()->intended(route('admin.pentadbir.index'));
+            return redirect()->intended(route('admin.dashboard'));
         } 
         
         if ($user->role === 'pentadbir') {
+            if ($user->pentadbirSekolah) {
+                $user->pentadbirSekolah()->update([
+                    'fld_ps_status' => 'aktif' 
+                ]);
+            }
             return redirect()->intended(route('pentadbir.dashboard'));
         }
 
-        // Fallback just in case they don't have a matching role
         return redirect('/');
     }
 
@@ -54,6 +56,16 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $user = auth()->user();
+
+        if ($user) {
+            if ($user->role === 'pentadbir' && $user->pentadbirSekolah) {
+                $user->pentadbirSekolah()->update([
+                    'fld_ps_status' => 'tidak_aktif'
+                ]);
+            }
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

@@ -38,6 +38,10 @@ class Pengawal extends Model
     {
         return $this->hasMany(LaporanKejadian::class, 'fld_pgw_idPengawal', 'fld_pgw_id');
     }
+    public function SesiRondaans(): HasMany
+    {
+        return $this->hasMany(SesiRondaan::class, 'fld_pgw_idPengawal', 'fld_pgw_id');
+    }
 
     public static function generatePgwId()
     {
