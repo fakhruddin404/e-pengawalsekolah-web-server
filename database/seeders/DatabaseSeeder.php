@@ -14,12 +14,6 @@ class DatabaseSeeder extends Seeder
     {
 
         User::factory()->create([
-            'name' => 'Super Admin',
-            'email' => 'admin@gmail.com',
-            'role' => 'admin',
-        ]);
-
-        User::factory()->create([
             'name' => 'Pentadbir Sekolah',
             'email' => 'pentadbir@gmail.com',
             'role' => 'pentadbir',
@@ -44,6 +38,7 @@ class DatabaseSeeder extends Seeder
         LokasiTitikSemak::factory(5)->create();
 
         $this->call([
+            AdminSeeder::class,
             PelawatSeeder::class,
             LaporanKejadianSeeder::class,
             PasLawatanSeeder::class,
