@@ -87,7 +87,7 @@ class LoginAuthApiController extends Controller
                 'location' => ["Lokasi tidak sah. Jarak terdekat: {$distanceMeters}m (maks: {$allowedMeters}m)."],
             ]);
         }
-
+        // kene baiki maybe
         $user->tokens()->where('name', 'mobile-pengawal')->delete();
         $token = $user->createToken('mobile-pengawal')->plainTextToken;
 

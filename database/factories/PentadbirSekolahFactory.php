@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class PentadbirSekolahFactory extends Factory
 {
     protected $model = PentadbirSekolah::class;
-    private static $sequence = 1;
+    private static $sequence = 2;
 
     /**
      * Define the model's default state.
@@ -29,7 +29,7 @@ class PentadbirSekolahFactory extends Factory
             'fld_ps_noTelefon' => '+601' . $this->faker->numerify('########'),
             'fld_ps_noIC' => $this->faker->numerify('######-##-####'),
             'fld_ps_jabatan' => $this->faker->randomElement(['Pengetua', 'Penyelia']),
-            'fld_ps_status' => $this->faker->randomElement(['aktif', 'tidak_aktif']),
+            'fld_ps_status' => 'aktif',
             'fld_ps_urlGambarWajah' => null,
         ];
     }
