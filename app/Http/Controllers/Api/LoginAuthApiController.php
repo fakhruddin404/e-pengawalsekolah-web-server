@@ -13,6 +13,13 @@ class LoginAuthApiController extends Controller
 {
     public function login(Request $request)
     {
+        // Aliases so clients may send email/latitude/longitude instead of login/lat/long
+        $request->merge([
+            'login' => $request->input('login') ?: $request->input('email'),
+            'lat' => $request->input('lat', $request->input('latitude')),
+            'long' => $request->input('long', $request->input('longitude')),
+        ]);
+
         $validated = $request->validate([
             // Accept either a real email OR a pengawal ID (e.g. PGW-001)
             'login' => ['required', 'string'],
@@ -21,8 +28,7 @@ class LoginAuthApiController extends Controller
             'long' => ['required', 'numeric', 'between:-180,180'],
         ]);
 
-        // Backward-compat for older clients sending "email"
-        $login = (string) ($validated['login'] ?? $request->input('email', ''));
+        $login = (string) $validated['login'];
 
         /** @var User|null $user */
         $user = User::query()
