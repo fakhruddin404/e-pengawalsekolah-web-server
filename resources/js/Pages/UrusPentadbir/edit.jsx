@@ -171,7 +171,7 @@ export default function Edit({ auth, pentadbir }) {
                                     value={data.fld_ps_jabatan}
                                     className="mt-1 block w-full bg-gray-50 border-gray-100"
                                     onChange={(e) => setData('fld_ps_jabatan', e.target.value)}
-                                    placeholder="Cth: Pengetua, PK HEM"
+                                    placeholder="Cth: Pengetua, Penyelia"
                                     required
                                 />
                                 <InputError message={errors.fld_ps_jabatan} className="mt-2" />

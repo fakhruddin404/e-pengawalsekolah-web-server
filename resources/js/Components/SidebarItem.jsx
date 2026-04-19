@@ -1,9 +1,10 @@
 import { Link } from '@inertiajs/react';
 
-export default function SidebarItem({ href, active, icon, children }) {
+export default function SidebarItem({ href, active, icon, children, onNavigate }) {
     return (
         <Link
             href={href}
+            onClick={() => onNavigate?.()}
             className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200
                 ${active
                     ? 'bg-[#f8f9fa] text-gray-900 shadow-sm border border-gray-100'

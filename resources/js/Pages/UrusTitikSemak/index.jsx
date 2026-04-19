@@ -62,7 +62,7 @@ export default function Index({ auth, titikSemaks }) {
                 {/* Peta (Map) Section */}
                 <div className="bg-white rounded-3xl p-2 shadow-sm border border-gray-100 overflow-hidden h-[400px] z-0 relative">
                     {/* React Leaflet Map */}
-                    <MapContainer center={defaultCenter} zoom={13} scrollWheelZoom={false} className="h-full w-full rounded-2xl z-0">
+                    <MapContainer center={defaultCenter} zoom={13} scrollWheelZoom={true} className="h-full w-full rounded-2xl z-0">
                         <TileLayer
                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

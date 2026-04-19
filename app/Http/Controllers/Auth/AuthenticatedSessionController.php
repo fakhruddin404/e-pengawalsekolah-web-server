@@ -36,16 +36,17 @@ class AuthenticatedSessionController extends Controller
         $user = $request->user();
 
         if ($user->role === 'admin') {
-            return redirect()->intended(route('admin.pentadbir.index'));
-        } 
-        
+            return redirect()->route('admin.pentadbir.index');
+        }
+
         if ($user->role === 'pentadbir') {
             if ($user->pentadbirSekolah) {
                 $user->pentadbirSekolah()->update([
-                    'fld_ps_status' => 'aktif' 
+                    'fld_ps_status' => 'aktif',
                 ]);
             }
-            return redirect()->intended(route('pentadbir.dashboard'));
+
+            return redirect()->route('pentadbir.dashboard');
         }
 
         return redirect('/');
@@ -61,9 +62,10 @@ class AuthenticatedSessionController extends Controller
         if ($user) {
             if ($user->role === 'pentadbir' && $user->pentadbirSekolah) {
                 $user->pentadbirSekolah()->update([
-                    'fld_ps_status' => 'tidak_aktif'
+                    'fld_ps_status' => 'tidak_aktif',
                 ]);
             }
+
         }
 
         Auth::guard('web')->logout();

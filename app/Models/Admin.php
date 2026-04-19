@@ -13,6 +13,12 @@ class Admin extends Model
     /**
      * @var list<string>
      */
+    protected $primaryKey = 'fld_adm_id';
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
     protected $fillable = [
         'user_id',
         'fld_adm_id',
@@ -26,4 +32,3 @@ class Admin extends Model
         return $this->belongsTo(User::class);
     }
 }
-

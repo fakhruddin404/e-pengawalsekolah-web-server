@@ -1,10 +1,20 @@
 import { usePage, Link } from '@inertiajs/react';
+import { useState } from 'react';
 import Aside from '@/Components/Aside';
 import Footer from '@/Components/Footer';
+
+function MenuIcon() {
+    return (
+        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    );
+}
 
 export default function PentadbirLayout({ header, breadcrumbs, children }) {
     const defaultUser = { name: 'Amirul', email: 'amirul@example.com' };
     const user = usePage().props.auth?.user || defaultUser;
+    const [asideOpen, setAsideOpen] = useState(true);
 
     // Specific links for Pentadbir
     const pentadbirNavItems = [
@@ -16,12 +26,31 @@ export default function PentadbirLayout({ header, breadcrumbs, children }) {
     ];
 
     return (
-        <div className="flex h-screen w-full overflow-hidden bg-[#f0f4f8] text-gray-800 font-sans">
-            <Aside user={user} navItems={pentadbirNavItems} />
+        <div className="relative flex h-screen w-full overflow-hidden bg-[#f0f4f8] text-gray-800 font-sans">
+            {asideOpen && (
+                <button
+                    type="button"
+                    className="fixed inset-0 z-30 bg-gray-900/40 lg:hidden"
+                    onClick={() => setAsideOpen(false)}
+                    aria-label="Tutup menu navigasi"
+                />
+            )}
 
-            <div className="flex flex-1 flex-col overflow-hidden">
-                <header className="flex h-16 items-center px-8 bg-white border-b border-gray-100">
-                    <div className="flex items-center gap-2 text-sm text-gray-400 font-medium">
+            <Aside user={user} navItems={pentadbirNavItems} open={asideOpen} onClose={() => setAsideOpen(false)} />
+
+            <div className="relative z-10 flex min-w-0 flex-1 flex-col overflow-hidden">
+                <header className="flex h-16 shrink-0 items-center gap-3 border-b border-gray-100 bg-white px-4 sm:px-8">
+                    <button
+                        type="button"
+                        onClick={() => setAsideOpen((prev) => !prev)}
+                        className="shrink-0 rounded-lg border border-gray-200 bg-gray-50 p-2 text-gray-700 shadow-sm hover:bg-gray-100 hover:text-gray-900"
+                        aria-expanded={asideOpen}
+                        aria-controls="app-sidebar-nav"
+                        aria-label={asideOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi'}
+                    >
+                        <MenuIcon />
+                    </button>
+                    <div className="flex min-w-0 flex-1 items-center gap-2 text-sm font-medium text-gray-400">
                         {header ? (
                             <span className="text-gray-600 font-medium capitalize">{header}</span>
                         ) : breadcrumbs ? (

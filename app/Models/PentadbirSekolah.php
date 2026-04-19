@@ -15,6 +15,12 @@ class PentadbirSekolah extends Model
      */
     protected $table = 'pentadbir_sekolahs';
 
+    protected $primaryKey = 'fld_ps_id';
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
     /**
      * @var list<string>
      */
@@ -37,14 +43,13 @@ class PentadbirSekolah extends Model
     {
         $lastPentadbir = self::orderBy('fld_ps_id', 'desc')->first();
 
-        if (!$lastPentadbir) {
+        if (! $lastPentadbir) {
             return 'PS-001';
         }
 
         $lastNumber = (int) str_replace('PS-', '', $lastPentadbir->fld_ps_id);
         $newNumber = $lastNumber + 1;
 
-        return 'PS-' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+        return 'PS-'.str_pad($newNumber, 3, '0', STR_PAD_LEFT);
     }
 }
-

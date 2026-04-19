@@ -16,6 +16,12 @@ class Pengawal extends Model
      */
     protected $table = 'pengawals';
 
+    protected $primaryKey = 'fld_pgw_id';
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
     /**
      * @var list<string>
      */
@@ -38,6 +44,7 @@ class Pengawal extends Model
     {
         return $this->hasMany(LaporanKejadian::class, 'fld_pgw_idPengawal', 'fld_pgw_id');
     }
+
     public function SesiRondaans(): HasMany
     {
         return $this->hasMany(SesiRondaan::class, 'fld_pgw_idPengawal', 'fld_pgw_id');
@@ -48,14 +55,13 @@ class Pengawal extends Model
         // Susun mengikut susunan ID (Primary Key) menurun untuk dapatkan yang terakhir dengan tepat
         $lastPengawal = self::orderBy('fld_pgw_id', 'desc')->first();
 
-        if (!$lastPengawal) {
+        if (! $lastPengawal) {
             return 'PGW-001';
         }
 
         $lastNumber = (int) str_replace('PGW-', '', $lastPengawal->fld_pgw_id);
         $newNumber = $lastNumber + 1;
 
-        return 'PGW-' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+        return 'PGW-'.str_pad($newNumber, 3, '0', STR_PAD_LEFT);
     }
 }
-

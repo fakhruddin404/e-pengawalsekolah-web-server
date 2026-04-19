@@ -1,28 +1,26 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\PengawalController;
-use App\Http\Controllers\TitikSemakController;  
-use App\Http\Controllers\PelawatController;
-use App\Http\Controllers\PentadbirController;
-use App\Http\Controllers\LaporanKejadianController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LaporanKejadianController;
+use App\Http\Controllers\PelawatController;
+use App\Http\Controllers\PengawalController;
+use App\Http\Controllers\PentadbirController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TitikSemakController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard') : redirect('/login');
 });
-
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // --- Traffic Controller ---
     Route::get('/dashboard', function () {
         return match (auth()->user()->role) {
-            'admin'     => redirect()->route('admin.pentadbir.index'),
+            'admin' => redirect()->route('admin.pentadbir.index'),
             'pentadbir' => redirect()->route('pentadbir.dashboard'),
-            default     => abort(403, 'Akses ditolak. Peranan tidak sah.'),
+            default => abort(403, 'Akses ditolak. Peranan tidak sah.'),
         };
     })->name('dashboard');
 
@@ -38,10 +36,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::prefix('pentadbir')->name('pentadbir.')->group(function () {
-        
+
         // dashboardRosak;
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
         // urus pengawal;
         Route::get('urus-pengawal', [PengawalController::class, 'index'])->name('pengawal.index');
         Route::get('urus-pengawal/tambah', [PengawalController::class, 'create'])->name('pengawal.create');
@@ -69,13 +67,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/laporan-kejadian/{laporanKejadian}/edit', [LaporanKejadianController::class, 'edit'])->name('laporan-kejadian.edit');
         Route::put('/laporan-kejadian/{laporanKejadian}', [LaporanKejadianController::class, 'update'])->name('laporan-kejadian.update');
         Route::delete('/laporan-kejadian/{laporanKejadian}', [LaporanKejadianController::class, 'destroy'])->name('laporan-kejadian.destroy');
-        });
+    });
 
     // profile;
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('edit');
         Route::patch('/', [ProfileController::class, 'update'])->name('update');
-        Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
     });
 
 });
