@@ -40,6 +40,31 @@ class Pengawal extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Nama paparan pengawal.
+     *
+     * Keutamaan:
+     * - `User->name` (jika ada)
+     * - `fld_pgw_id` (contoh: PGW-001)
+     * - fallback: 'Pengawal'
+     */
+    public function displayName(): string
+    {
+        $name = (string) ($this->user?->name ?? '');
+        $name = trim($name);
+        if ($name !== '') {
+            return $name;
+        }
+
+        $pgwId = (string) ($this->fld_pgw_id ?? '');
+        $pgwId = trim($pgwId);
+        if ($pgwId !== '') {
+            return $pgwId;
+        }
+
+        return 'Pengawal';
+    }
+
     public function laporanKejadians(): HasMany
     {
         return $this->hasMany(LaporanKejadian::class, 'fld_pgw_idPengawal', 'fld_pgw_id');
