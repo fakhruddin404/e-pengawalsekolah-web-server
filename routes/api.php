@@ -15,5 +15,9 @@ Route::prefix('pengawal')->group(function () {
             'pengawal' => $user?->pengawal,
         ]);
     });
+
+    Route::middleware('auth:sanctum')->get('me/photo', [LoginAuthApiController::class, 'mePhoto']);
+
+    Route::middleware('auth:sanctum')->post('email/verification-notification', [LoginAuthApiController::class, 'sendEmailVerification']);
 });
 

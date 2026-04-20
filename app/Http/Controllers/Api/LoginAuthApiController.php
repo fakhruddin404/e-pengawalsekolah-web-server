@@ -7,6 +7,8 @@ use App\Models\Admin;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class LoginAuthApiController extends Controller
@@ -97,6 +99,8 @@ class LoginAuthApiController extends Controller
         $user->tokens()->where('name', 'mobile-pengawal')->delete();
         $token = $user->createToken('mobile-pengawal')->plainTextToken;
 
+        $hasPhoto = (string) ($pengawal->fld_pgw_urlGambarWajah ?? '') !== '';
+
         return response()->json([
             'token' => $token,
             'token_type' => 'Bearer',
@@ -108,6 +112,8 @@ class LoginAuthApiController extends Controller
             ],
             'pengawal' => [
                 'fld_pgw_id' => $pengawal->fld_pgw_id,
+                'nama' => $pengawal->displayName() ?: $user->name,
+                'photo_url' => $hasPhoto ? url('/api/pengawal/me/photo') : null,
                 'fld_pgw_noTelefon' => $pengawal->fld_pgw_noTelefon,
                 'fld_pgw_noIC' => $pengawal->fld_pgw_noIC,
                 'fld_pgw_status' => $pengawal->fld_pgw_status,
@@ -122,6 +128,58 @@ class LoginAuthApiController extends Controller
             'distance_meters' => $distanceMeters,
             'allowed_meters' => $allowedMeters,
         ]);
+    }
+
+    public function mePhoto(Request $request)
+    {
+        $user = $request->user();
+        $pengawal = $user?->pengawal;
+        $pathOrUrl = (string) ($pengawal?->fld_pgw_urlGambarWajah ?? '');
+
+        if ($pathOrUrl === '') {
+            return response()->json(['message' => 'Tiada gambar pengawal.'], 404);
+        }
+
+        // If already an absolute URL, redirect to it.
+        if (Str::startsWith($pathOrUrl, ['http://', 'https://'])) {
+            return redirect()->away($pathOrUrl);
+        }
+
+        // If it's a public path like /storage/..., try serving from public/
+        $publicRelative = ltrim($pathOrUrl, '/');
+        $publicFull = public_path($publicRelative);
+        if (is_file($publicFull)) {
+            return response()->file($publicFull);
+        }
+
+        // Otherwise try Laravel's public disk (storage/app/public/*)
+        $diskPath = preg_replace('#^storage/#', '', $publicRelative) ?? $publicRelative;
+        if (Storage::disk('public')->exists($diskPath)) {
+            $tmpFull = Storage::disk('public')->path($diskPath);
+            if (is_file($tmpFull)) {
+                return response()->file($tmpFull);
+            }
+        }
+
+        return response()->json(['message' => 'Gambar tidak dijumpai.'], 404);
+    }
+
+    public function sendEmailVerification(Request $request)
+    {
+        $user = $request->user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        if (method_exists($user, 'hasVerifiedEmail') && $user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Email sudah disahkan.'], 200);
+        }
+
+        if (method_exists($user, 'sendEmailVerificationNotification')) {
+            $user->sendEmailVerificationNotification();
+        }
+
+        return response()->json(['message' => 'Pautan pengesahan telah dihantar.'], 200);
     }
 
     private function haversineMeters(float $lat1, float $lon1, float $lat2, float $lon2): int
