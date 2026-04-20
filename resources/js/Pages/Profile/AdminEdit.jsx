@@ -14,7 +14,6 @@ import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 import BioDataShell from './Partials/BioDataShell';
 import DeleteUserForm from './Partials/DeleteUserForm';
-import EmailFieldWithVerification from './Partials/EmailFieldWithVerification';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateEmailForm from './Partials/UpdateEmailForm';
 delete L.Icon.Default.prototype._getIconUrl;
