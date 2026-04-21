@@ -19,5 +19,7 @@ Route::prefix('pengawal')->group(function () {
     Route::middleware('auth:sanctum')->get('me/photo', [LoginAuthApiController::class, 'mePhoto']);
 
     Route::middleware('auth:sanctum')->post('email/verification-notification', [LoginAuthApiController::class, 'sendEmailVerification']);
+
+    Route::middleware('auth:sanctum')->post('update-profile', [LoginAuthApiController::class, 'updateProfile']);
 });
 

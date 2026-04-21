@@ -76,7 +76,7 @@ export default function PentadbirLayout({ header, breadcrumbs, children }) {
                                 ))}
                             </div>
                         ) : (
-                            <span className="text-gray-600 font-medium capitalize">Papan Pemuka Interaktif</span>
+                            <span className="text-gray-600 font-medium capitalize">Papan Pemuka</span>
                         )}
                     </div>
                 </header>

@@ -6,6 +6,13 @@ import { useEffect, useState } from 'react';
 export default function Aside({ user, navItems, open = true, onClose }) {
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
+    const pentadbirPhoto = user?.pentadbir_sekolah?.fld_ps_urlGambarWajah;
+    const avatarSrc = pentadbirPhoto
+        ? `/pentadbirImej/${pentadbirPhoto}`
+        : `https://ui-avatars.com/api/?background=e5e7eb&color=111827&name=${encodeURIComponent(
+              user?.name || 'Pengguna'
+          )}`;
+
     const closeDrawer = () => onClose?.();
 
     const closeDrawerAfterNav = () => {
@@ -98,13 +105,13 @@ export default function Aside({ user, navItems, open = true, onClose }) {
                     <div className="flex items-center gap-3">
                         <div className="h-9 w-9 rounded-full overflow-hidden bg-gray-200 border-2 border-white shadow-sm shrink-0">
                             <img
-                                src={`https://ui-avatars.com/api/?name=${user.name}&background=1e293b&color=fff`}
-                                alt={user.name}
+                                src={avatarSrc}
+                                alt={user?.name || 'Pengguna'}
                                 className="h-full w-full object-cover"
                             />
                         </div>
                         <span className="text-sm font-semibold text-gray-800 truncate text-left w-24">
-                            {user.name}
+                            {user?.name || 'Pengguna'}
                         </span>
                     </div>
 

@@ -98,8 +98,6 @@ export default function PentadbirEdit({ mustVerifyEmail, status, pentadbirSekola
             <div className="w-full flex flex-col min-h-0">
                 <div className="w-full rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 shadow-sm">
                     <BioDataShell
-                        title="Bio-data"
-                        backHref={route('pentadbir.dashboard')}
                         avatar={avatarWithPencil}
                         name={user.name}
                         email={user.email}

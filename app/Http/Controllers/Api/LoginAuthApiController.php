@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rule;
 
 class LoginAuthApiController extends Controller
 {
@@ -33,6 +34,7 @@ class LoginAuthApiController extends Controller
 
         $login = (string) $validated['login'];
 
+        // get user by email
         /** @var User|null $user */
         $user = User::query()
             ->where('email', $login)
@@ -58,6 +60,7 @@ class LoginAuthApiController extends Controller
             ]);
         }
 
+        // get pengawal record
         $pengawal = $user->pengawal;
         if (! $pengawal) {
             throw ValidationException::withMessages([
@@ -66,14 +69,20 @@ class LoginAuthApiController extends Controller
         }
 
         $allowedMeters = (int) env('PENGAWAL_LOGIN_MAX_DISTANCE_METERS', 200);
-
-        $admins = Admin::query()->get(['fld_adm_id', 'fld_adm_namaSekolah', 'fld_adm_latitud', 'fld_adm_longitud']);
+        
+        // get lat/long of admins
+        $admins = Admin::query()->get([
+            'fld_adm_id',
+            'fld_adm_namaSekolah',
+            'fld_adm_latitud',
+            'fld_adm_longitud',
+        ]);
         if ($admins->isEmpty()) {
             throw ValidationException::withMessages([
                 'location' => ['Tiada lokasi admin untuk semakan.'],
             ]);
         }
-
+        // sorting lat/long data and kira the distance between pengawal and admin
         $distanceMeters = null;
         $matchedAdmin = null;
         foreach ($admins as $candidate) {
@@ -90,14 +99,16 @@ class LoginAuthApiController extends Controller
             }
         }
 
+        // check if the distance is within the allowed meters
         if ($distanceMeters === null || $distanceMeters > $allowedMeters || $matchedAdmin === null) {
             $distanceMeters ??= 0;
             throw ValidationException::withMessages([
                 'location' => ["Lokasi tidak sah. Jarak terdekat: {$distanceMeters}m (maks: {$allowedMeters}m)."],
             ]);
         }
-        // kene baiki maybe
+        // delete existing token
         $user->tokens()->where('name', 'mobile-pengawal')->delete();
+        // create new token
         $token = $user->createToken('mobile-pengawal')->plainTextToken;
 
         $hasPhoto = (string) ($pengawal->fld_pgw_urlGambarWajah ?? '') !== '';
@@ -121,8 +132,6 @@ class LoginAuthApiController extends Controller
                 'fld_pgw_statusSemasa' => $pengawal->fld_pgw_statusSemasa,
             ],
             'admin_location' => [
-                'fld_adm_id' => $matchedAdmin->fld_adm_id,
-                'fld_adm_namaSekolah' => $matchedAdmin->fld_adm_namaSekolah,
                 'fld_adm_latitud' => $matchedAdmin->fld_adm_latitud,
                 'fld_adm_longitud' => $matchedAdmin->fld_adm_longitud,
             ],
@@ -131,38 +140,77 @@ class LoginAuthApiController extends Controller
         ]);
     }
 
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        // 1. Validasi data yang dihantar dari React Native
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'phone' => 'nullable|string|max:20',
+            'ic' => ['required', 'string', 'regex:/^\d{6}-\d{2}-\d{4}$/'],
+        ]);
+
+        // 2. Check jika email diubah
+        $emailChanged = $user->email !== $request->email;
+
+        // 3. Kemaskini jadual Users
+        $user->name = $request->name;
+        $user->email = $request->email;
+
+        if ($emailChanged) {
+            $user->email_verified_at = null; // Un-verify email
+        }
+        
+        $user->save();
+
+        // 4. Kemaskini jadual Pengawal (jika ada relation)
+        if ($user->pengawal) {
+            $user->pengawal->update([
+                'fld_pgw_noTelefon' => $request->phone,
+                'fld_pgw_noIC' => $request->ic,
+            ]);
+        }
+
+        // 5. Hantar link secara automatik jika email bertukar
+        if ($emailChanged) {
+            // Ini akan panggil event standard Laravel untuk hantar email
+            $user->sendEmailVerificationNotification(); 
+        }
+
+        // 6. Pulangkan response
+        return response()->json([
+            'message' => 'Profil berjaya dikemaskini.',
+            'email_changed' => $emailChanged,
+            'user' => $user,
+        ], 200);
+    }
+
     public function mePhoto(Request $request)
     {
         $user = $request->user();
         $pengawal = $user?->pengawal;
-        $pathOrUrl = (string) ($pengawal?->fld_pgw_urlGambarWajah ?? '');
+        $filename = $pengawal?->fld_pgw_urlGambarWajah;
 
-        if ($pathOrUrl === '') {
-            return response()->json(['message' => 'Tiada gambar pengawal.'], 404);
+        // 1. If no filename exists in DB, redirect to UI-Avatars immediately
+        if (!$filename) {
+            $name = urlencode($user->name ?? 'User');
+            return redirect()->away("https://ui-avatars.com/api/?name={$name}&background=1e293b&color=fff");
         }
 
-        // If already an absolute URL, redirect to it.
-        if (Str::startsWith($pathOrUrl, ['http://', 'https://'])) {
-            return redirect()->away($pathOrUrl);
+        // 2. Define the path inside the public folder
+        // Since you said images are in public/pengawalImej/
+        $pathInPublic = 'pengawalImej/' . $filename;
+        $fullPath = public_path($pathInPublic);
+
+        // 3. Check if file actually exists on the server
+        if (file_exists($fullPath) && is_file($fullPath)) {
+            return response()->file($fullPath);
         }
 
-        // If it's a public path like /storage/..., try serving from public/
-        $publicRelative = ltrim($pathOrUrl, '/');
-        $publicFull = public_path($publicRelative);
-        if (is_file($publicFull)) {
-            return response()->file($publicFull);
-        }
-
-        // Otherwise try Laravel's public disk (storage/app/public/*)
-        $diskPath = preg_replace('#^storage/#', '', $publicRelative) ?? $publicRelative;
-        if (Storage::disk('public')->exists($diskPath)) {
-            $tmpFull = Storage::disk('public')->path($diskPath);
-            if (is_file($tmpFull)) {
-                return response()->file($tmpFull);
-            }
-        }
-
-        return response()->json(['message' => 'Gambar tidak dijumpai.'], 404);
+        // 4. Fallback if the database has a name but the file is missing from disk
+        return response()->json(['message' => 'Fail gambar tidak wujud di server.'], 404);
     }
 
     public function sendEmailVerification(Request $request)
