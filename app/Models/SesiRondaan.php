@@ -17,10 +17,14 @@ class SesiRondaan extends Model
     protected $fillable = [
         'fld_sr_idSesi',
         'fld_pgw_idPengawal',
-        'fld_sr_masaMula',
-        'fld_sr_masaTamat',
-        'fld_sr_urlGPX',
-        'fld_sr_jumlahTitikSemak',
+        'fld_sr_tempoh',
+        'fld_sr_pathRoute',
+        'fld_sr_peratusTitikSemak',
+    ];
+
+    protected $casts = [
+        'fld_sr_pathRoute' => 'array',
+        'fld_sr_peratusTitikSemak' => 'integer',
     ];
 
     public function pengawal()
