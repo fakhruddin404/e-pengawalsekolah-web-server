@@ -22,21 +22,35 @@ class SesiRondaanFactory extends Factory
 
         $idNumber = str_pad(self::$sequence++, 3, '0', STR_PAD_LEFT);
 
-        $bilTitikSemak = LokasiTitikSemak::distinct()->count('fld_loc_id');
+        $bilTitikSemak = (int) LokasiTitikSemak::distinct()->count('fld_loc_id');
+        $jumlahDilawat = $bilTitikSemak > 0 ? $this->faker->numberBetween(0, $bilTitikSemak) : 0;
+        $peratusTitikSemak = $bilTitikSemak > 0
+            ? (int) round(($jumlahDilawat / $bilTitikSemak) * 100)
+            : 0;
 
-        $masaMula = $this->faker->dateTimeBetween('-14 days', 'now');
-        $isTamat = $this->faker->boolean(70);
-        $masaTamat = $isTamat
-            ? (clone $masaMula)->modify('+' . $this->faker->numberBetween(20, 180) . ' minutes')
-            : null;
+        $tempohMinit = $this->faker->numberBetween(5, 180);
+
+        $pathRoute = null;
+        if ($bilTitikSemak > 0 && $jumlahDilawat > 0) {
+            $pathRoute = LokasiTitikSemak::inRandomOrder()
+                ->limit($jumlahDilawat)
+                ->get(['fld_loc_id', 'fld_loc_nama', 'fld_loc_latitud', 'fld_loc_longitud'])
+                ->map(fn ($t) => [
+                    'fld_loc_id' => $t->fld_loc_id,
+                    'nama' => $t->fld_loc_nama,
+                    'lat' => $t->fld_loc_latitud,
+                    'lng' => $t->fld_loc_longitud,
+                ])
+                ->values()
+                ->all();
+        }
 
         return [
             'fld_sr_idSesi' => 'SR-' . $idNumber,
             'fld_pgw_idPengawal' => $pengawalId,
-            'fld_sr_masaMula' => $masaMula,
-            'fld_sr_masaTamat' => $masaTamat,
-            'fld_sr_urlGPX' => null,
-            'fld_sr_jumlahTitikSemak' => $this->faker->numberBetween(1, $bilTitikSemak),
+            'fld_sr_tempoh' => $tempohMinit . ' min',
+            'fld_sr_pathRoute' => $pathRoute,
+            'fld_sr_peratusTitikSemak' => $peratusTitikSemak,
         ];
     }
 }

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Pengawal;
+use App\Models\LokasiTitikSemak;
+use App\Models\SesiRondaan;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -188,6 +190,45 @@ class LoginAuthApiController extends Controller
             'email_changed' => $emailChanged,
             'user' => $user,
         ], 200);
+    }
+
+
+
+    public function getTitikSemak()
+    {
+        $titikSemak = LokasiTitikSemak::query()->get([
+            'fld_loc_id',
+            'fld_loc_nama',
+            'fld_loc_latitud',
+            'fld_loc_longitud',
+        ]);
+        return response()->json($titikSemak);
+    }
+
+
+    public function simpanRondaan(Request $request)
+    {
+        $request->validate([
+            'path' => 'required|array',       // Array koordinat (userRoute dari React Native)
+            'peratus' => 'required|numeric',  // Peratusan titik semak yang discan
+            'durasi' => 'required|string',    // Masa yang diambil
+        ]);
+
+        $user = $request->user();
+
+        // Simpan ke jadual rekod_rondaan (anda perlu bina migration untuk jadual ini)
+        $sesiRondaan = SesiRondaan::create([
+            'fld_sr_idSesi' => SesiRondaan::generateSrId(),
+            'fld_pgw_idPengawal' => $user->pengawal->fld_pgw_id,
+            'fld_sr_pathRoute' => json_encode($request->path), 
+            'fld_sr_peratusTitikSemak' => $request->peratus,
+            'fld_sr_tempoh' => $request->durasi,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Rekod rondaan berjaya disimpan!',
+        ]);
     }
 
 

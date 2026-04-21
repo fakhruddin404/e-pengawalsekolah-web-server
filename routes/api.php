@@ -28,6 +28,10 @@ Route::prefix('pengawal')->group(function () {
 
     Route::middleware('auth:sanctum')->post('update-profile', [LoginAuthApiController::class, 'updateProfile']);
 
+    Route::middleware('auth:sanctum')->get('titik-semak', [LoginAuthApiController::class, 'getTitikSemak']);
+    
+    Route::middleware('auth:sanctum')->post('simpan-rondaan', [LoginAuthApiController::class, 'simpanRondaan']);
+
 
 });
 

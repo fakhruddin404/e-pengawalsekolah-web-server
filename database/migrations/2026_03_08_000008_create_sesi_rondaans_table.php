@@ -17,12 +17,11 @@ return new class extends Migration
 
             $table->string('fld_pgw_idPengawal');
 
-            $table->dateTime('fld_sr_masaMula');
-            $table->dateTime('fld_sr_masaTamat')->nullable();
+            $table->string('fld_sr_tempoh')->nullable();
 
-            $table->string('fld_sr_urlGPX')->nullable();
+            $table->json('fld_sr_pathRoute')->nullable();
 
-            $table->integer('fld_sr_jumlahTitikSemak');
+            $table->integer('fld_sr_peratusTitikSemak');
 
             $table->timestamps();
 
