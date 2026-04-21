@@ -140,10 +140,10 @@ export default function Index({ auth, pelawats }) {
                                 <tr>
                                     <th className="px-5 py-4 font-medium">ID</th>
                                     <th className="px-5 py-4 font-medium">Nama</th>
-                                    <th className="px-5 py-4 font-medium">No. IC</th>
-                                    <th className="px-5 py-4 font-medium">No.Tel</th>
                                     <th className="px-5 py-4 font-medium">No. Kenderaan</th>
-                                    <th className="px-5 py-4 font-medium text-center">Status</th>
+                                    <th className="px-5 py-4 font-medium">No.Tel</th>
+                                    <th className="px-5 py-4 font-medium">Status Senarai Hitam</th>
+                                    <th className="px-5 py-4 font-medium text-center"></th>
                                     <th className="px-5 py-4 font-medium text-center"></th>
                                 </tr>
                             </thead>
