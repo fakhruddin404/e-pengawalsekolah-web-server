@@ -235,8 +235,8 @@ class LoginAuthApiController extends Controller
             // Option A: Show a web page
             // return view('auth.email-verified-success'); 
             
-            // Option B: Deep link back to your React Native app (e.g., myapp://email-verified)
-            return redirect('myapp://email-verified'); 
+            // Option B: Deep link back to your React Native app (e.g., epsmobile://email-verified)
+            return redirect('epsmobile://email-verified'); 
         }
 
         // 4. Mark email as verified and trigger the Laravel event
@@ -245,7 +245,26 @@ class LoginAuthApiController extends Controller
         }
 
         // 5. Redirect back to mobile app or success page
-        return redirect('myapp://email-verified'); 
+        $userAgent = $request->header('User-Agent');
+        
+        // Semak jika User-Agent mengandungi kata kunci peranti mudah alih
+        $isMobile = preg_match('/(android|iphone|ipad|mobile)/i', $userAgent);
+
+        if ($isMobile) {
+            // Jika di TELEFON: Tolak masuk ke Apps semula
+            return redirect('epsmobile://email-verified'); 
+        } else {
+            // Jika di LAPTOP/WEB: Tunjukkan paparan mesej berjaya yang cantik
+            return response()->sendContent("
+                <div style='text-align: center; padding-top: 50px; font-family: sans-serif;'>
+                    <h1 style='color: #2d3748;'>Email Berjaya Disahkan! ✅</h1>
+                    <p style='color: #4a5568;'>Akaun anda kini aktif. Sila buka aplikasi di telefon anda untuk log masuk semula.</p>
+                    <div style='margin-top: 20px; color: #718096; font-size: 0.9em;'>
+                        Anda boleh menutup tab browser ini sekarang.
+                    </div>
+                </div>
+            ");
+        } 
     }
 
 
@@ -268,7 +287,7 @@ class LoginAuthApiController extends Controller
         return response()->json(['message' => 'Pautan pengesahan telah dihantar.'], 200);
     }
 
-    
+
 
     private function haversineMeters(float $lat1, float $lon1, float $lat2, float $lon2): int
     {
