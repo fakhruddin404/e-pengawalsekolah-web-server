@@ -121,6 +121,7 @@ class LoginAuthApiController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role,
+                'email_verified_at' => $user->email_verified_at,
             ],
             'pengawal' => [
                 'fld_pgw_id' => $pengawal->fld_pgw_id,
@@ -139,6 +140,8 @@ class LoginAuthApiController extends Controller
             'allowed_meters' => $allowedMeters,
         ]);
     }
+
+
 
     public function updateProfile(Request $request)
     {
@@ -187,6 +190,8 @@ class LoginAuthApiController extends Controller
         ], 200);
     }
 
+
+
     public function mePhoto(Request $request)
     {
         $user = $request->user();
@@ -213,6 +218,38 @@ class LoginAuthApiController extends Controller
         return response()->json(['message' => 'Fail gambar tidak wujud di server.'], 404);
     }
 
+
+
+    public function verifyEmail(Request $request, $id, $hash)
+    {
+        // 1. Find the user manually (since they aren't logged in via session)
+        $user = User::findOrFail($id);
+
+        // 2. Double-check the hash matches their actual email
+        if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            return response()->json(['message' => 'Pautan tidak sah atau telah luput.'], 403);
+        }
+
+        // 3. If already verified, just redirect them to success
+        if ($user->hasVerifiedEmail()) {
+            // Option A: Show a web page
+            // return view('auth.email-verified-success'); 
+            
+            // Option B: Deep link back to your React Native app (e.g., myapp://email-verified)
+            return redirect('myapp://email-verified'); 
+        }
+
+        // 4. Mark email as verified and trigger the Laravel event
+        if ($user->markEmailAsVerified()) {
+            event(new Verified($user));
+        }
+
+        // 5. Redirect back to mobile app or success page
+        return redirect('myapp://email-verified'); 
+    }
+
+
+
     public function sendEmailVerification(Request $request)
     {
         $user = $request->user();
@@ -230,6 +267,8 @@ class LoginAuthApiController extends Controller
 
         return response()->json(['message' => 'Pautan pengesahan telah dihantar.'], 200);
     }
+
+    
 
     private function haversineMeters(float $lat1, float $lon1, float $lat2, float $lon2): int
     {

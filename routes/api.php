@@ -3,9 +3,15 @@
 use App\Http\Controllers\Api\LoginAuthApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Models\User;
+use Illuminate\Auth\Events\Verified;
 
 Route::prefix('pengawal')->group(function () {
     Route::post('login', [LoginAuthApiController::class, 'login']);
+
+    Route::get('/email/verify/{id}/{hash}', [LoginAuthApiController::class, 'verifyEmail'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
 
     Route::middleware('auth:sanctum')->get('me', function (Request $request) {
         $user = $request->user();
@@ -21,5 +27,7 @@ Route::prefix('pengawal')->group(function () {
     Route::middleware('auth:sanctum')->post('email/verification-notification', [LoginAuthApiController::class, 'sendEmailVerification']);
 
     Route::middleware('auth:sanctum')->post('update-profile', [LoginAuthApiController::class, 'updateProfile']);
+
+
 });
 
