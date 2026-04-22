@@ -231,7 +231,7 @@ class LoginAuthApiController extends Controller
         $sesiRondaan = SesiRondaan::create([
             'fld_sr_idSesi' => SesiRondaan::generateSrId(),
             'fld_pgw_idPengawal' => $user->pengawal->fld_pgw_id,
-            'fld_sr_pathRoute' => json_encode($request->path), 
+            'fld_sr_pathRoute' => $request->path, 
             'fld_sr_peratusTitikSemak' => $request->peratus,
             'fld_sr_tempoh' => $request->durasi,
         ]);
