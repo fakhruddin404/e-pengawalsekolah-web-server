@@ -26,22 +26,26 @@ jobs:
             # 2. Kemas kini pakej Backend
             composer install --no-dev --optimize-autoloader
 
-            # 3. Benarkan user deploy menulis (selepas chown ke www-data pada deploy lalu);
-            #    tanpa ini, "npm run build" boleh gagal dan manifest.json tidak terhasil.
-            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S chown -R "$USER:$USER" public storage bootstrap/cache
+            # 3. Pastikan permission Laravel konsisten (log/cache ditulis oleh www-data).
+            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S mkdir -p storage/logs bootstrap/cache
+            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S chown -R www-data:www-data storage bootstrap/cache
+            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S chmod -R 775 storage bootstrap/cache
+
+            # 4. Benarkan user deploy menulis build Vite (public/build).
+            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S chown -R "$USER:$USER" public
             rm -rf public/build
 
-            # 4. Masak fail UI Frontend
+            # 5. Masak fail UI Frontend
             npm ci
             npm run build
 
-            # 5. Cuci cache Laravel & Route
-            php artisan migrate --force
-            php artisan optimize:clear
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
+            # 6. Cuci cache Laravel & Route (jalan sebagai www-data untuk elak isu permission log/cache)
+            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S -u www-data php artisan migrate --force
+            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S -u www-data php artisan optimize:clear
+            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S -u www-data php artisan config:cache
+            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S -u www-data php artisan route:cache
+            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S -u www-data php artisan view:cache
 
-            # 6. SET PERMISSION SELEPAS BUILD
-            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S chown -R www-data:www-data public storage bootstrap/cache
-            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S chmod -R 775 public storage bootstrap/cache
+            # 7. SET PERMISSION SELEPAS BUILD
+            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S chown -R www-data:www-data public/build storage bootstrap/cache
+            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S chmod -R 775 public/build storage bootstrap/cache
