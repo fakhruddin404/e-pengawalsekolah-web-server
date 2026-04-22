@@ -81,7 +81,7 @@ class LoginAuthApiController extends Controller
         ]);
         if ($admins->isEmpty()) {
             throw ValidationException::withMessages([
-                'location' => ['Tiada lokasi admin untuk semakan.'],
+                'location' => ['Tiada lokasi sekolah untuk semakan.'],
             ]);
         }
         // sorting lat/long data and kira the distance between pengawal and admin
@@ -105,7 +105,7 @@ class LoginAuthApiController extends Controller
         if ($distanceMeters === null || $distanceMeters > $allowedMeters || $matchedAdmin === null) {
             $distanceMeters ??= 0;
             throw ValidationException::withMessages([
-                'location' => ["Lokasi tidak sah. Jarak terdekat: {$distanceMeters}m (maks: {$allowedMeters}m)."],
+                'location' => ["Lokasi tidak sah. Anda berada {$distanceMeters}m dari lokasi sekolah(Jarak yang dibenarkan adalah {$allowedMeters}m)."],
             ]);
         }
         // delete existing token
