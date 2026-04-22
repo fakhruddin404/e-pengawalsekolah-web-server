@@ -40,7 +40,7 @@ class LaporanKejadianController extends Controller
     public function update(Request $request, LaporanKejadian $laporanKejadian)
     {
         $validated = $request->validate([
-            'fld_rpt_status' => 'required|in:baru,dalam_siasatan,selesai',
+            'fld_rpt_status' => 'required|in:Baru,Dalam Siasatan,Selesai',
         ]);
 
         $laporanKejadian->update($validated);

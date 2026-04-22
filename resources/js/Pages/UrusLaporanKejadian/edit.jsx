@@ -45,7 +45,7 @@ export default function Edit({ auth, laporanKejadian }) {
         fld_rpt_kategori: laporanKejadian.fld_rpt_kategori ?? '',
         fld_rpt_keterangan: laporanKejadian.fld_rpt_keterangan ?? '',
         fld_rpt_tarikhMasa: toDatetimeLocal(laporanKejadian.fld_rpt_tarikhMasa),
-        fld_rpt_status: laporanKejadian.fld_rpt_status ?? 'baru',
+        fld_rpt_status: laporanKejadian.fld_rpt_status ?? 'Baru',
     });
 
     const submit = (e) => {
@@ -139,9 +139,9 @@ export default function Edit({ auth, laporanKejadian }) {
                                     onChange={(e) => setData('fld_rpt_status', e.target.value)}
                                     required
                                 >
-                                    <option value="baru">Baru</option>
-                                    <option value="dalam_siasatan">Dalam Siasatan</option>
-                                    <option value="selesai">Selesai</option>
+                                    <option value="Baru">Baru</option>
+                                    <option value="Dalam Siasatan">Dalam Siasatan</option>
+                                    <option value="Selesai">Selesai</option>
                                 </select>
                                 <InputError message={errors.fld_rpt_status} className="mt-2" />
                             </div>

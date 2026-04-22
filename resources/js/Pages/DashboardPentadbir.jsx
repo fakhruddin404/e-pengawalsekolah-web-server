@@ -1,5 +1,5 @@
 import PentadbirLayout from '@/Layouts/PentadbirLayout'; 
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 // Import Recharts
 import {
@@ -34,14 +34,30 @@ L.Icon.Default.mergeOptions({
 });
 
 // Letakkan props dari Controller di sini
-export default function DashboardPentadbir({ kpi, dataPelawat, dataRondaan, dataStatusRPT, senaraiRondaan }) {
+const statusPelawatLabel = {
+    aktif: 'Aktif',
+    keluar: 'Keluar',
+    ditolak: 'Ditolak',
+    masuk: 'Masuk',
+};
+
+const tajukGrafPelawat = {
+    minggu: 'Pelawat (Minggu Ini)',
+    bulan: 'Pelawat (Bulan Ini)',
+    tahun: 'Pelawat (Tahun Ini)',
+};
+
+export default function DashboardPentadbir({ kpi, dataPelawat, pelawatLihat, dataRondaan, dataStatusRPT, senaraiRondaan, pasPelawat }) {
     
     // Jika data props belum sedia (mengelakkan error semasa load)
     const stats = kpi || { laporan_baru: 0, rondaan_harian: 0, pelawat_aktif: 0, pengawal_aktif: 0 };
     const tableData = senaraiRondaan || [];
+    const pasPelawatRows = pasPelawat || [];
     const chartData = dataPelawat || [];
     const barData = dataRondaan || [];
     const donutData = dataStatusRPT || [];
+    const modPelawat = ['minggu', 'bulan', 'tahun'].includes(pelawatLihat) ? pelawatLihat : 'bulan';
+    const tajukPelawatGraf = tajukGrafPelawat[modPelawat] ?? tajukGrafPelawat.bulan;
 
     const donutColors = ['#3b82f6', '#f59e0b', '#10b981'];
 
@@ -77,14 +93,55 @@ export default function DashboardPentadbir({ kpi, dataPelawat, dataRondaan, data
 
                 {/* 2. Line Chart - Menggunakan Recharts */}
                 <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-[#a855f7] font-semibold">Pelawat (Bulan Ini)</h3>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6">
+                        <h3 className="text-[#a855f7] font-semibold">{tajukPelawatGraf}</h3>
+                        <div className="inline-flex flex-wrap gap-1 rounded-xl bg-slate-100/90 p-1 text-xs font-medium text-slate-600">
+                            {[
+                                { k: 'minggu', t: 'Minggu' },
+                                { k: 'bulan', t: 'Bulan' },
+                                { k: 'tahun', t: 'Tahun' },
+                            ].map(({ k, t }) => (
+                                <Link
+                                    key={k}
+                                    href={route('pentadbir.dashboard', { pelawat_lihat: k })}
+                                    preserveScroll
+                                    className={
+                                        'rounded-lg px-3 py-1.5 transition-colors ' +
+                                        (modPelawat === k
+                                            ? 'bg-white text-violet-700 shadow-sm'
+                                            : 'text-slate-500 hover:text-slate-800')
+                                    }
+                                >
+                                    {t}
+                                </Link>
+                            ))}
+                        </div>
                     </div>
                     
-                    <div className="h-48 w-full text-xs text-gray-400">
+                    <div className="h-48 w-full text-xs text-slate-500">
                         <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={chartData}>
-                                <XAxis dataKey="name" stroke="#cbd5e1" fontSize={12} tickLine={false} axisLine={false} />
+                            <LineChart
+                                data={chartData}
+                                margin={{ top: 8, right: 8, left: 4, bottom: 4 }}
+                            >
+                                <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" vertical={false} />
+                                <XAxis
+                                    dataKey="name"
+                                    stroke="#94a3b8"
+                                    fontSize={11}
+                                    tickLine={true}
+                                    axisLine={true}
+                                    tick={{ fill: '#64748b' }}
+                                />
+                                <YAxis
+                                    stroke="#94a3b8"
+                                    fontSize={11}
+                                    tickLine={false}
+                                    axisLine={true}
+                                    tick={{ fill: '#64748b' }}
+                                    allowDecimals={false}
+                                    width={32}
+                                />
                                 <Tooltip 
                                     contentStyle={{ borderRadius: '10px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                 />
@@ -215,6 +272,69 @@ export default function DashboardPentadbir({ kpi, dataPelawat, dataRondaan, data
                                 ) : (
                                     <tr>
                                         <td colSpan="4" className="text-center py-6 text-gray-400">Tiada rekod rondaan dijumpai.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {/* 6. Senarai Pas Lawatan (Pelawat) */}
+                <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                    <h3 className="text-[#0ea5e9] font-semibold mb-4">Senarai Pas Lawatan</h3>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm text-gray-500">
+                            <thead className="text-xs text-gray-400 uppercase bg-gray-50/50">
+                                <tr>
+                                    <th className="px-4 py-3 font-medium rounded-l-lg">ID Pas</th>
+                                    <th className="px-4 py-3 font-medium">Nama Pelawat</th>
+                                    <th className="px-4 py-3 font-medium">No. IC</th>
+                                    <th className="px-4 py-3 font-medium">Tujuan</th>
+                                    <th className="px-4 py-3 font-medium">Masa Masuk</th>
+                                    <th className="px-4 py-3 font-medium">Status</th>
+                                    <th className="px-4 py-3 font-medium text-right rounded-r-lg">ID Pengawal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {pasPelawatRows.length > 0 ? (
+                                    pasPelawatRows.map((row) => (
+                                        <tr
+                                            key={row.id_pas}
+                                            className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50"
+                                        >
+                                            <td className="px-4 py-4 font-medium text-gray-800 whitespace-nowrap">
+                                                {row.id_pas}
+                                            </td>
+                                            <td className="px-4 py-4 text-gray-800">{row.nama_pelawat}</td>
+                                            <td className="px-4 py-4 whitespace-nowrap">{row.no_ic}</td>
+                                            <td className="px-4 py-4 max-w-xs truncate" title={row.tujuan}>
+                                                {row.tujuan}
+                                            </td>
+                                            <td className="px-4 py-4 whitespace-nowrap">{row.masa_masuk}</td>
+                                            <td className="px-4 py-4">
+                                                <span
+                                                    className={
+                                                        'inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ' +
+                                                        (row.status === 'aktif' || row.status === 'masuk'
+                                                            ? 'bg-emerald-100 text-emerald-800'
+                                                            : row.status === 'keluar'
+                                                              ? 'bg-slate-100 text-slate-700'
+                                                              : 'bg-rose-100 text-rose-800')
+                                                    }
+                                                >
+                                                    {statusPelawatLabel[row.status] ?? row.status}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-4 text-right font-medium text-gray-800 whitespace-nowrap">
+                                                {row.id_pengawal}
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="7" className="text-center py-6 text-gray-400">
+                                            Tiada rekod pas lawatan dijumpai.
+                                        </td>
                                     </tr>
                                 )}
                             </tbody>

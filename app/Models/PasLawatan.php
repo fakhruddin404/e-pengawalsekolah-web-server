@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PasLawatan extends Model
 {
@@ -22,6 +23,11 @@ class PasLawatan extends Model
         'fld_pas_masaMasuk',
         'fld_pas_masaKeluar',
         'fld_pas_statusPas',
+    ];
+
+    protected $casts = [
+        'fld_pas_masaMasuk' => 'datetime',
+        'fld_pas_masaKeluar' => 'datetime',
     ];
 
     public function pengawal(): BelongsTo
