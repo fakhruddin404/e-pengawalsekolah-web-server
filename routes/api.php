@@ -32,6 +32,8 @@ Route::prefix('pengawal')->group(function () {
     
     Route::middleware('auth:sanctum')->post('simpan-rondaan', [LoginAuthApiController::class, 'simpanRondaan']);
 
+    Route::middleware('auth:sanctum')->post('sahkan-titik', [LoginAuthApiController::class, 'sahkanTitik']);
+
 
 });
 
