@@ -21,6 +21,8 @@ import {
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { useMemo, useState } from 'react';
+import { Marker, Polyline } from 'react-leaflet';
 
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
@@ -60,6 +62,72 @@ export default function DashboardPentadbir({ kpi, dataPelawat, pelawatLihat, dat
     const tajukPelawatGraf = tajukGrafPelawat[modPelawat] ?? tajukGrafPelawat.bulan;
 
     const donutColors = ['#3b82f6', '#f59e0b', '#10b981'];
+    const [routeModal, setRouteModal] = useState({
+        open: false,
+        id_pengawal: null,
+        tarikh: null,
+        tempoh: null,
+        peratus: null,
+        pathRoute: null,
+    });
+
+    // Demo route (placeholder) – boleh sambung ke data sebenar bila siap
+    const routeCenter = [3.07385, 101.60742];
+    const demoRoute = useMemo(
+        () => [
+            [3.0729, 101.6064],
+            [3.0734, 101.6068],
+            [3.0732, 101.6076],
+            [3.0739, 101.6079],
+            [3.0742, 101.6072],
+            [3.0737, 101.6069],
+            [3.0739, 101.6062],
+        ],
+        []
+    );
+
+    function normalizePathToLatLng(path) {
+        if (!Array.isArray(path)) return [];
+        return path
+            .map((p) => {
+                const lat = p?.latitude ?? p?.lat ?? p?.Lat ?? p?.LAT;
+                const lng = p?.longitude ?? p?.lng ?? p?.lon ?? p?.Long ?? p?.LNG;
+                const latNum = Number(lat);
+                const lngNum = Number(lng);
+                if (Number.isFinite(latNum) && Number.isFinite(lngNum)) return [latNum, lngNum];
+                return null;
+            })
+            .filter(Boolean);
+    }
+
+    function haversineKm(a, b) {
+        const toRad = (d) => (d * Math.PI) / 180;
+        const R = 6371;
+        const dLat = toRad(b[0] - a[0]);
+        const dLng = toRad(b[1] - a[1]);
+        const lat1 = toRad(a[0]);
+        const lat2 = toRad(b[0]);
+        const x =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.sin(dLng / 2) * Math.sin(dLng / 2) * Math.cos(lat1) * Math.cos(lat2);
+        return 2 * R * Math.asin(Math.min(1, Math.sqrt(x)));
+    }
+
+    const routePoints = useMemo(() => {
+        const pts = normalizePathToLatLng(routeModal.pathRoute);
+        return pts.length >= 2 ? pts : demoRoute;
+    }, [routeModal.pathRoute, demoRoute]);
+
+    const routeStats = useMemo(() => {
+        let km = 0;
+        for (let i = 1; i < routePoints.length; i++) km += haversineKm(routePoints[i - 1], routePoints[i]);
+        const pct = Number(routeModal.peratus);
+        return {
+            km: Number.isFinite(km) ? km : 0,
+            peratus: Number.isFinite(pct) ? Math.max(0, Math.min(100, pct)) : null,
+            tempoh: routeModal.tempoh ?? null,
+        };
+    }, [routePoints, routeModal.peratus, routeModal.tempoh]);
 
     return (
         <PentadbirLayout>
@@ -260,7 +328,16 @@ export default function DashboardPentadbir({ kpi, dataPelawat, pelawatLihat, dat
                                                 <div className="flex justify-center">
                                                     <button 
                                                         className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
-                                                        onClick={() => alert(`Buka peta untuk ID: ${row.id_pengawal}`)}
+                                                        onClick={() =>
+                                                            setRouteModal({
+                                                                open: true,
+                                                                id_pengawal: row.id_pengawal,
+                                                                tarikh: row.tarikh,
+                                                                tempoh: row.tempoh ?? null,
+                                                                peratus: row.peratus ?? row.kepatuhan_num ?? null,
+                                                                pathRoute: row.pathRoute ?? null,
+                                                            })
+                                                        }
                                                     >
                                                         <ApplicationLogo type={3} className="w-4 h-4 opacity-80" />
                                                         Lihat Peta
@@ -343,6 +420,94 @@ export default function DashboardPentadbir({ kpi, dataPelawat, pelawatLihat, dat
                 </div>
 
             </div>
+
+            {/* Modal: Laluan Sesi Rondaan */}
+            {routeModal.open && (
+                <div
+                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Laluan Sesi Rondaan"
+                    onClick={() =>
+                        setRouteModal({
+                            open: false,
+                            id_pengawal: null,
+                            tarikh: null,
+                            tempoh: null,
+                            peratus: null,
+                            pathRoute: null,
+                        })
+                    }
+                >
+                    <div
+                        className="w-full max-w-5xl rounded-3xl bg-white shadow-2xl overflow-hidden"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="px-6 pt-6 pb-3">
+                            <div className="flex items-start justify-between gap-4">
+                                <div>
+                                    <div className="text-sm font-semibold text-slate-700">Laluan Sesi Rondaan</div>
+                                    <div className="mt-1 text-xs text-slate-500">
+                                        ID: <span className="font-semibold text-slate-700">{routeModal.id_pengawal ?? '—'}</span>
+                                        {routeModal.tarikh ? <span className="ml-2">• {routeModal.tarikh}</span> : null}
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                                    onClick={() =>
+                                        setRouteModal({
+                                            open: false,
+                                            id_pengawal: null,
+                                            tarikh: null,
+                                            tempoh: null,
+                                            peratus: null,
+                                            pathRoute: null,
+                                        })
+                                    }
+                                >
+                                    Tutup
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="relative px-6 pb-6">
+                            <div className="relative z-0 rounded-2xl border border-slate-200 overflow-hidden h-[420px] bg-slate-50">
+                                <MapContainer
+                                    center={routePoints?.[0] ?? routeCenter}
+                                    zoom={17}
+                                    scrollWheelZoom={true}
+                                    className="h-full w-full"
+                                >
+                                    <TileLayer
+                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    />
+                                    <Polyline positions={routePoints} pathOptions={{ color: '#f97316', weight: 5, opacity: 0.95 }} />
+                                    <Marker position={routePoints[routePoints.length - 1]} />
+                                </MapContainer>
+                            </div>
+
+                            {/* Info card style seperti imej contoh */}
+                            <div className="absolute right-10 top-16 z-[2000] w-56 rounded-2xl bg-white/95 shadow-lg border border-slate-200 p-4">
+                                <div className="text-sm font-semibold text-slate-800">
+                                    {(routeStats.tempoh ?? '—') + ' (' + routeStats.km.toFixed(1) + ' km)'}
+                                </div>
+                                <div className="mt-1 text-[11px] text-slate-500">Pemantauan titik semak</div>
+                                <div className="mt-3 h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+                                    <div
+                                        className="h-2 bg-blue-500"
+                                        style={{ width: `${routeStats.peratus ?? 0}%` }}
+                                    />
+                                </div>
+                                <div className="mt-2 text-[11px] font-semibold text-blue-600">
+                                    {routeStats.peratus !== null ? `${routeStats.peratus}%` : '—'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </PentadbirLayout>
     );
 }

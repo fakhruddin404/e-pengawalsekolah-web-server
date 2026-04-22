@@ -56,10 +56,14 @@ class DashboardController extends Controller
                 $peratus = (int) $item->fld_sr_peratusTitikSemak;
 
                 return [
+                    'id_sesi'       => $item->fld_sr_idSesi,
                     'id_pengawal'   => $item->pengawal->fld_pgw_id ?? 'Tiada',
                     'tarikh'        => $item->created_at->format('d M, Y'),
+                    'tempoh'        => $item->fld_sr_tempoh,
+                    'peratus'       => $peratus,
                     'kepatuhan'     => $peratus . '%',
                     'kepatuhan_num' => $peratus,
+                    'pathRoute'     => $item->fld_sr_pathRoute,
                 ];
             });
 
