@@ -15,6 +15,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
+            set -e
             cd /var/www/e_pengawalsekolah
 
             # 1. Reset dan tarik kod terkini
@@ -25,12 +26,13 @@ jobs:
             # 2. Kemas kini pakej Backend
             composer install --no-dev --optimize-autoloader
 
-            # 3. SET PERMISSION SEBELUM BUILD
-            # Padam folder build lama menggunakan sudo supaya Vite ada kebenaran untuk buat baru
-            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S rm -rf public/build
+            # 3. Benarkan user deploy menulis (selepas chown ke www-data pada deploy lalu);
+            #    tanpa ini, "npm run build" boleh gagal dan manifest.json tidak terhasil.
+            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S chown -R "$USER:$USER" public storage bootstrap/cache
+            rm -rf public/build
 
             # 4. Masak fail UI Frontend
-            npm install
+            npm ci
             npm run build
 
             # 5. Cuci cache Laravel & Route
