@@ -15,37 +15,33 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            set -e
             cd /var/www/e_pengawalsekolah
 
-            # 1. Reset dan tarik kod terkini
+            # 1. RAMPAS HAK MILIK SEMENTARA
+            # Supaya Git (epsadmin) boleh ubah/padam fail tanpa dihalang (Permission denied)
+            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S chown -R $USER:$USER .
+
+            # 2. Tarik kod terkini dari GitHub
             git fetch --all
             git reset --hard origin/main
             git pull origin main
 
-            # 2. Kemas kini pakej Backend
+            # 3. Kemas kini pakej Backend
             composer install --no-dev --optimize-autoloader
 
-            # 3. Pastikan permission Laravel konsisten (log/cache ditulis oleh www-data).
-            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S mkdir -p storage/logs bootstrap/cache
-            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S chown -R www-data:www-data storage bootstrap/cache
-            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S chmod -R 775 storage bootstrap/cache
-
-            # 4. Benarkan user deploy menulis build Vite (public/build).
-            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S chown -R "$USER:$USER" public
+            # 4. Masak fail UI Frontend (Buang folder build lama dulu untuk elak isu Vite)
             rm -rf public/build
-
-            # 5. Masak fail UI Frontend
-            npm ci
+            npm install
             npm run build
 
-            # 6. Cuci cache Laravel & Route (jalan sebagai www-data untuk elak isu permission log/cache)
-            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S -u www-data php artisan migrate --force
-            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S -u www-data php artisan optimize:clear
-            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S -u www-data php artisan config:cache
-            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S -u www-data php artisan route:cache
-            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S -u www-data php artisan view:cache
+            # 5. Cuci cache Laravel & Route (Jalankan sebagai epsadmin biasa)
+            php artisan migrate --force
+            php artisan optimize:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
 
-            # 7. SET PERMISSION SELEPAS BUILD
-            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S chown -R www-data:www-data public/build storage bootstrap/cache
-            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S chmod -R 775 public/build storage bootstrap/cache
+            # 6. SERAH SEMULA HAK KEPADA NGINX SELEPAS SELESAI
+            # Supaya pengguna web boleh muat naik gambar ke public/pentadbirImej & baca cache
+            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S chown -R www-data:www-data storage bootstrap/cache public
+            echo "${{ secrets.SERVER_PASSWORD }}" | sudo -S chmod -R 775 storage bootstrap/cache public
