@@ -202,7 +202,18 @@ class LoginAuthApiController extends Controller
             'fld_loc_latitud',
             'fld_loc_longitud',
         ]);
-        return response()->json($titikSemak);
+
+        // Return a "clean" payload for mobile clients (while still sourced from DB columns)
+        $normalized = $titikSemak->map(function ($row) {
+            return [
+                'id' => $row->fld_loc_id,
+                'name' => $row->fld_loc_nama,
+                'latitude' => (float) $row->fld_loc_latitud,
+                'longitude' => (float) $row->fld_loc_longitud,
+            ];
+        });
+
+        return response()->json($normalized);
     }
 
 
@@ -226,8 +237,12 @@ class LoginAuthApiController extends Controller
         ]);
 
         return response()->json([
-            'status' => 'success',
+            'success' => true,
+            'status' => 'success', // keep for backward compatibility
             'message' => 'Rekod rondaan berjaya disimpan!',
+            'data' => [
+                'fld_sr_idSesi' => $sesiRondaan->fld_sr_idSesi ?? null,
+            ],
         ]);
     }
 
