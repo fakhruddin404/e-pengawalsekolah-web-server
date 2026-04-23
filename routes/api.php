@@ -1,15 +1,17 @@
 <?php
 
-use App\Http\Controllers\Api\LoginAuthApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Models\User;
-use Illuminate\Auth\Events\Verified;
+use App\Http\Controllers\Api\Auth\EmailVerificationController;
+use App\Http\Controllers\Api\Auth\LoginController;
+use App\Http\Controllers\Api\Pengawal\PengawalMediaController;
+use App\Http\Controllers\Api\Profile\ProfileController;
+use App\Http\Controllers\Api\Rondaan\RondaanController;
 
 Route::prefix('pengawal')->group(function () {
-    Route::post('login', [LoginAuthApiController::class, 'login']);
+    Route::post('login', [LoginController::class, 'login']);
 
-    Route::get('/email/verify/{id}/{hash}', [LoginAuthApiController::class, 'verifyEmail'])
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verifyEmail'])
     ->middleware(['signed', 'throttle:6,1'])
     ->name('verification.verify');
 
@@ -22,17 +24,17 @@ Route::prefix('pengawal')->group(function () {
         ]);
     });
 
-    Route::middleware('auth:sanctum')->get('me/photo', [LoginAuthApiController::class, 'mePhoto']);
+    Route::middleware('auth:sanctum')->get('me/photo', [PengawalMediaController::class, 'mePhoto']);
 
-    Route::middleware('auth:sanctum')->post('email/verification-notification', [LoginAuthApiController::class, 'sendEmailVerification']);
+    Route::middleware('auth:sanctum')->post('email/verification-notification', [EmailVerificationController::class, 'sendEmailVerification']);
 
-    Route::middleware('auth:sanctum')->post('update-profile', [LoginAuthApiController::class, 'updateProfile']);
+    Route::middleware('auth:sanctum')->post('update-profile', [ProfileController::class, 'updateProfile']);
 
-    Route::middleware('auth:sanctum')->get('titik-semak', [LoginAuthApiController::class, 'getTitikSemak']);
+    Route::middleware('auth:sanctum')->get('titik-semak', [RondaanController::class, 'getTitikSemak']);
     
-    Route::middleware('auth:sanctum')->post('simpan-rondaan', [LoginAuthApiController::class, 'simpanRondaan']);
+    Route::middleware('auth:sanctum')->post('simpan-rondaan', [RondaanController::class, 'simpanRondaan']);
 
-    Route::middleware('auth:sanctum')->post('sahkan-titik', [LoginAuthApiController::class, 'sahkanTitik']);
+    Route::middleware('auth:sanctum')->post('sahkan-titik', [RondaanController::class, 'sahkanTitik']);
 
 
 });
