@@ -37,7 +37,8 @@ export default function Index({ auth, pelawats }) {
                 (visitor) =>
                     visitor.fld_vis_namaPenuh.toLowerCase().includes(lowercasedSearch) ||
                     visitor.fld_vis_id.toLowerCase().includes(lowercasedSearch) ||
-                    (visitor.fld_vis_noKenderaan && visitor.fld_vis_noKenderaan.toLowerCase().includes(lowercasedSearch))
+                    visitor.fld_vis_noIC.toLowerCase().includes(lowercasedSearch) ||
+                    visitor.fld_vis_noTelefon.toLowerCase().includes(lowercasedSearch)
             );
         }
 
@@ -95,7 +96,7 @@ export default function Index({ auth, pelawats }) {
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Cari nama, ID, atau no. kenderaan..."
+                                placeholder="Cari nama, ID, No.IC, atau no. telefon..."
                                 className="block w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
                             />
                         </div>
@@ -140,11 +141,11 @@ export default function Index({ auth, pelawats }) {
                                 <tr>
                                     <th className="px-5 py-4 font-medium">ID</th>
                                     <th className="px-5 py-4 font-medium">Nama</th>
-                                    <th className="px-5 py-4 font-medium">No. Kenderaan</th>
+                                    <th className="px-5 py-4 font-medium">No.IC</th>
                                     <th className="px-5 py-4 font-medium">No.Tel</th>
-                                    <th className="px-5 py-4 font-medium">Status Senarai Hitam</th>
-                                    <th className="px-5 py-4 font-medium text-center"></th>
-                                    <th className="px-5 py-4 font-medium text-center"></th>
+                                    {/* 1. Tambah text-center di sini */}
+                                    <th className="px-5 py-4 font-medium text-center">Status Senarai Hitam</th>
+                                    <th className="px-5 py-4 font-medium text-center">Tindakan</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
@@ -153,39 +154,35 @@ export default function Index({ auth, pelawats }) {
                                         <tr key={visitor.fld_vis_id} className="hover:bg-gray-50/80 transition-colors">
                                             <td className="px-5 py-4 font-medium text-gray-800">{visitor.fld_vis_id}</td>
                                             <td className="px-5 py-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="h-9 w-9 rounded-full overflow-hidden bg-gray-200 shrink-0 ring-2 ring-white shadow-sm">
-                                                        <img
-                                                            src={visitor.fld_vis_urlGambarWajah
-                                                                ? `/pelawatImej/${visitor.fld_vis_urlGambarWajah}`
-                                                                : `https://ui-avatars.com/api/?name=${visitor.fld_vis_namaPenuh}&background=1e293b&color=fff`}
-                                                            alt={visitor.fld_vis_namaPenuh}
-                                                            className="h-full w-full object-cover"
-                                                        />
-                                                    </div>
-                                                    <span className="font-semibold text-gray-800">{visitor.fld_vis_namaPenuh}</span>
+                                                <span className="font-semibold text-gray-800">{visitor.fld_vis_namaPenuh}</span>
+                                            </td>
+                                            <td className="px-5 py-4">{visitor.fld_vis_noIC}</td>
+                                            <td className="px-5 py-4">{visitor.fld_vis_noTelefon}</td>
+                                            
+                                            {/* 2. Pastikan td ini text-center dan flexbox digunakan di dalam getStatusBadge jika perlu */}
+                                            <td className="px-5 py-4 text-center">
+                                                <div className="flex justify-center">
+                                                    {getStatusBadge(visitor.fld_vis_statusSenaraiHitam)}
                                                 </div>
                                             </td>
-                                            <td className="px-5 py-4">{visitor.fld_vis_noKenderaan || '-'}</td>
-                                            <td className="px-5 py-4">{visitor.fld_vis_noTelefon}</td>
-                                            <td className="px-5 py-4 text-center">
-                                                {getStatusBadge(visitor.fld_vis_statusSenaraiHitam)}
-                                            </td>
+
                                             <td className="px-5 py-4 text-center">
                                                 <div className="flex items-center justify-center gap-2">
                                                     <Link
                                                         href={route('pentadbir.pelawat.edit', visitor.fld_vis_id)}
-                                                        title="Kemas kini maklumat"
-                                                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition-all shadow-sm"
+                                                        className="p-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition-all shadow-sm"
                                                     >
-                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                        </svg>
                                                     </Link>
                                                     <button
                                                         onClick={() => deleteVisitor(visitor)}
-                                                        title="Padam rekod"
-                                                        className="p-1.5 text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-all"
+                                                        className="p-2 text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-all"
                                                     >
-                                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
                                                     </button>
                                                 </div>
                                             </td>

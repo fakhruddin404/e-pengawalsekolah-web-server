@@ -10,7 +10,17 @@ class PelawatController extends Controller
 {
     public function index()
     {
-        $pelawats = Pelawat::latest()->get();
+        $pelawats = Pelawat::query()
+            ->latest()
+            ->get([
+                'fld_vis_id',
+                'fld_vis_noIC',
+                'fld_vis_namaPenuh',
+                'fld_vis_noTelefon',
+                'fld_vis_statusSenaraiHitam',
+                'created_at',
+                'updated_at',
+            ]);
             
         return Inertia::render('UrusPelawat/index', [
             'pelawats' => $pelawats
@@ -41,12 +51,6 @@ class PelawatController extends Controller
 
     public function destroy(Pelawat $pelawat)
     {
-        if ($pelawat->fld_vis_urlGambarWajah) {
-            $pathGambar = public_path('pelawatImej/' . $pelawat->fld_vis_urlGambarWajah);
-            if (file_exists($pathGambar)) {
-                unlink($pathGambar);
-            }
-        }
         $pelawat->delete();
 
         return redirect()

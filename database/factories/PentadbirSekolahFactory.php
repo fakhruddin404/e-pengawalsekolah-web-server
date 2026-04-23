@@ -29,7 +29,7 @@ class PentadbirSekolahFactory extends Factory
             'fld_ps_noTelefon' => '+601' . $this->faker->numerify('########'),
             'fld_ps_noIC' => $this->faker->numerify('######-##-####'),
             'fld_ps_jabatan' => $this->faker->randomElement(['Pengetua', 'Penyelia']),
-            'fld_ps_status' => 'aktif',
+            'fld_ps_status' => 'tidak_aktif',
             'fld_ps_urlGambarWajah' => null,
         ];
     }

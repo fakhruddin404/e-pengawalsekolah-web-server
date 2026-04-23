@@ -50,6 +50,7 @@ class PasLawatanFactory extends Factory
                 'Ambil anak',
                 'Lain-lain',
             ]),
+            'fld_pas_noKenderaan' => strtoupper($this->faker->bothify('??? ####')),
             'fld_pas_masaMasuk' => $masaMasuk,
             'fld_pas_masaKeluar' => $masaKeluar,
             'fld_pas_statusPas' => $status,

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pelawat extends Model
 {
@@ -18,8 +19,6 @@ class Pelawat extends Model
         'fld_vis_noIC',
         'fld_vis_namaPenuh',
         'fld_vis_noTelefon',
-        'fld_vis_noKenderaan',
-        'fld_vis_urlGambarWajah',
         'fld_vis_statusSenaraiHitam',
     ];
 

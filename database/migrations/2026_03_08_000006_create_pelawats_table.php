@@ -19,10 +19,6 @@ return new class extends Migration
             $table->string('fld_vis_namaPenuh');
             $table->string('fld_vis_noTelefon', 15);
 
-            $table->string('fld_vis_noKenderaan')->nullable()->index();
-
-            $table->string('fld_vis_urlGambarWajah')->nullable();
-
             $table->boolean('fld_vis_statusSenaraiHitam')->default(false);
 
             $table->timestamps();

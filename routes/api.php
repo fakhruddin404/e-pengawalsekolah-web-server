@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutController;
+use App\Http\Controllers\Api\Pelawat\PelawatController as ApiPelawatController;
+use App\Http\Controllers\Api\PasLawatan\PasLawatanController as ApiPasLawatanController;
 use App\Http\Controllers\Api\Pengawal\PengawalMediaController;
 use App\Http\Controllers\Api\Profile\ProfileController;
 use App\Http\Controllers\Api\Rondaan\RondaanController;
@@ -38,6 +40,19 @@ Route::prefix('pengawal')->group(function () {
     Route::middleware('auth:sanctum')->post('simpan-rondaan', [RondaanController::class, 'simpanRondaan']);
 
     Route::middleware('auth:sanctum')->post('sahkan-titik', [RondaanController::class, 'sahkanTitik']);
+
+    // Pelawat + Pas Lawatan (mobile)
+    Route::middleware('auth:sanctum')->get('pelawat/search', [ApiPelawatController::class, 'search']);
+    
+    Route::middleware('auth:sanctum')->get('pelawat/aktif', [ApiPelawatController::class, 'aktif']);
+    // Backward compatible alias (mobile fallback path)
+    Route::middleware('auth:sanctum')->get('pelawat-aktif', [ApiPelawatController::class, 'aktif']);
+
+    Route::middleware('auth:sanctum')->post('pas-lawatan', [ApiPasLawatanController::class, 'store']);
+    Route::middleware('auth:sanctum')->post('pas-lawatan/{id}/keluar', [ApiPasLawatanController::class, 'keluar']);
+    // Backward compatible aliases (mobile fallback paths)
+    Route::middleware('auth:sanctum')->post('pas-lawatan/keluar/{id}', [ApiPasLawatanController::class, 'keluar']);
+    Route::middleware('auth:sanctum')->post('keluar-pas-lawatan/{id}', [ApiPasLawatanController::class, 'keluar']);
 
 
 });

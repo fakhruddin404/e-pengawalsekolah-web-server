@@ -7,11 +7,7 @@ import TextInput from '@/Components/TextInput';
 import PrimaryButton from '@/Components/PrimaryButton';
 
 export default function Edit({ auth, pelawat }) {
-    const [preview, setPreview] = useState(
-        pelawat.fld_vis_urlGambarWajah
-            ? `/pelawatImej/${pelawat.fld_vis_urlGambarWajah}`
-            : null
-    );
+    const [preview] = useState(null);
 
     const { data, setData, post, processing, errors } = useForm({
         _method: 'put',
@@ -22,24 +18,13 @@ export default function Edit({ auth, pelawat }) {
         temp_noTelefon_full: pelawat.fld_vis_noTelefon
             ? pelawat.fld_vis_noTelefon.replace('+60', '')
             : '',
-        fld_vis_noKenderaan: pelawat.fld_vis_noKenderaan || '',
         fld_vis_statusSenaraiHitam: pelawat.fld_vis_statusSenaraiHitam || 0,
-        fld_vis_urlGambarWajah: null,
     });
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setData('fld_vis_urlGambarWajah', file);
-            setPreview(URL.createObjectURL(file));
-        }
-    };
 
     const submit = (e) => {
         e.preventDefault();
 
         post(route('pentadbir.pelawat.update', pelawat.fld_vis_id), {
-            forceFormData: true,
             preserveScroll: true,
         });
     };
@@ -134,20 +119,6 @@ export default function Edit({ auth, pelawat }) {
                                 <InputError message={errors.fld_vis_noTelefon} className="mt-2" />
                             </div>
 
-                            {/* No.Kenderaan */}
-                            <div>
-                                <InputLabel htmlFor="fld_vis_noKenderaan" value="No. Kenderaan" />
-                                <TextInput
-                                    id="fld_vis_noKenderaan"
-                                    type="text"
-                                    name="fld_vis_noKenderaan"
-                                    value={data.fld_vis_noKenderaan}
-                                    className="mt-1 block w-full bg-gray-200 text-gray-500 border-gray-200 cursor-not-allowed font-bold"
-                                    readOnly
-                                />
-                                <InputError message={errors.fld_vis_noKenderaan} className="mt-2" />
-                            </div>
-
                             {/* Status Senarai Hitam */}
                             <div>
                                 <InputLabel htmlFor="fld_vis_statusSenaraiHitam" value="Status" />
@@ -165,20 +136,6 @@ export default function Edit({ auth, pelawat }) {
                                 <InputError message={errors.fld_vis_statusSenaraiHitam} className="mt-2" />
                             </div>
 
-                            {/* Gambar Peribadi Section */}
-                            <div className="space-y-2 lg:col-span-2">
-                                <InputLabel htmlFor="fld_vis_urlGambarWajah" value="Gambar Peribadi" />
-
-                                {preview && (
-                                    <div className="mb-3">
-                                        <img
-                                            src={preview}
-                                            alt="Preview"
-                                            className="h-24 w-24 object-cover rounded-2xl border-2 border-orange-100 shadow-sm"
-                                        />
-                                    </div>
-                                )}
-                            </div>
                         </div>
 
                         <div className="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-gray-100">

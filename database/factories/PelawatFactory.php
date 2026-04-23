@@ -23,8 +23,6 @@ class PelawatFactory extends Factory
             'fld_vis_noIC' => $this->faker->numerify('######-##-####'),
             'fld_vis_namaPenuh' => $this->faker->name(),
             'fld_vis_noTelefon' => '+601' . $this->faker->numerify('########'),
-            'fld_vis_noKenderaan' => strtoupper($this->faker->bothify('??? ####')),
-            'fld_vis_urlGambarWajah' => null,
             'fld_vis_statusSenaraiHitam' => $this->faker->boolean(15), // 15% chance to be in blacklist
         ];
     }

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('fld_vis_id');
 
             $table->string('fld_pas_tujuan');
+            $table->string('fld_pas_noKenderaan')->nullable()->index();
 
             $table->dateTime('fld_pas_masaMasuk');
             $table->dateTime('fld_pas_masaKeluar')->nullable();
