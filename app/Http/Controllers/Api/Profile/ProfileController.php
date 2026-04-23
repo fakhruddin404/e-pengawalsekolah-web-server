@@ -18,7 +18,8 @@ class ProfileController extends Controller
             'name' => 'required|string|max:255',
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'phone' => 'nullable|string|max:20',
-            'ic' => ['required', 'string', 'regex:/^\d{6}-\d{2}-\d{4}$/'],
+            // Accept either "000000-00-0000" or "000000000000" (mobile often stores 12 digits).
+            'ic' => ['required', 'string', 'regex:/^(\d{6}-\d{2}-\d{4}|\d{12})$/'],
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
