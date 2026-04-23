@@ -60,7 +60,9 @@ class ProfileController extends Controller
     
             // Update the filename in the database
             if ($user->pengawal) {
-                $user->pengawal->fld_pgw_urlGambarWajah = $filename;
+                $user->pengawal->update([
+                    'fld_pgw_urlGambarWajah' => $filename,
+                ]);
             }
         }
 
@@ -81,7 +83,7 @@ class ProfileController extends Controller
         return response()->json([
             'message' => 'Profil berjaya dikemaskini.',
             'email_changed' => $emailChanged,
-            'user' => $user ->load($user->pengawal),
+            'user' => $user->fresh()->load('pengawal'),
         ], 200);
     }
 }
