@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\Auth\LoginController;
+use App\Http\Controllers\Api\Auth\LogoutController;
 use App\Http\Controllers\Api\Pengawal\PengawalMediaController;
 use App\Http\Controllers\Api\Profile\ProfileController;
 use App\Http\Controllers\Api\Rondaan\RondaanController;
@@ -27,6 +28,8 @@ Route::prefix('pengawal')->group(function () {
     Route::middleware('auth:sanctum')->get('me/photo', [PengawalMediaController::class, 'mePhoto']);
 
     Route::middleware('auth:sanctum')->post('email/verification-notification', [EmailVerificationController::class, 'sendEmailVerification']);
+
+    Route::middleware('auth:sanctum')->post('logout', [LogoutController::class, 'logout']);
 
     Route::middleware('auth:sanctum')->post('update-profile', [ProfileController::class, 'updateProfile']);
 
