@@ -15,11 +15,11 @@ return new class extends Migration
 
             $table->string('fld_pas_idPas')->primary();
 
-            $table->string('fld_pgw_idPengawal');
-            $table->string('fld_vis_id');
+            $table->string('fld_pgw_idPengawal')->index();
+            $table->string('fld_vis_id')->index();
 
             $table->string('fld_pas_tujuan');
-            $table->string('fld_pas_noKenderaan')->nullable()->index();
+            $table->string('fld_pas_noKenderaan', 50)->nullable()->index();
 
             $table->dateTime('fld_pas_masaMasuk');
             $table->dateTime('fld_pas_masaKeluar')->nullable();
@@ -28,7 +28,7 @@ return new class extends Migration
                 'aktif',
                 'keluar',
                 'ditolak'
-            ])->default('aktif');
+            ])->default('aktif')->index();
 
             $table->timestamps();
 

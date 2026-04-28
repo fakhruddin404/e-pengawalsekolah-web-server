@@ -13,13 +13,24 @@ class PasLawatanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'id' => ['nullable', 'string'], // pelawat id (optional)
+            // Optional existing Pelawat id (VIS-xxx). If supplied, must exist.
+            'id' => ['nullable', 'string', 'exists:pelawats,fld_vis_id'],
+
+            // Pelawat info (will be created/updated).
             'namaPenuh' => ['required', 'string', 'max:255'],
             'noTel' => ['required', 'string', 'max:15'],
-            'ic' => ['required', 'string', 'max:20'],
+            'ic' => ['required', 'string', 'max:20', 'regex:/^\d{6}-\d{2}-\d{4}$/'],
+
+            // Pas info
             'noKenderaan' => ['nullable', 'string', 'max:50'],
             'tujuan' => ['required', 'string', 'max:255'],
-            'masaMasuk' => ['required', 'date_format:H:i'],
+
+            // Mobile sends time only (HH:mm) or (HH:mm:ss)
+            'masaMasuk' => ['required', 'string', 'regex:/^\d{2}:\d{2}(:\d{2})?$/'],
+        ], [
+            'id.exists' => 'ID pelawat tidak dijumpai.',
+            'ic.regex' => 'No IC mestilah format 112345-12-1234.',
+            'masaMasuk.regex' => 'Format masaMasuk mestilah HH:mm atau HH:mm:ss.',
         ]);
 
         $user = $request->user();
@@ -68,14 +79,20 @@ class PasLawatanController extends Controller
             ], 403);
         }
 
-        $masaMasuk = Carbon::today()->setTimeFromTimeString((string) $validated['masaMasuk']);
+        $masaMasukString = (string) $validated['masaMasuk'];
+        $masaMasuk = str_contains($masaMasukString, ':') && substr_count($masaMasukString, ':') === 2
+            ? Carbon::today()->setTimeFromTimeString($masaMasukString) // HH:mm:ss
+            : Carbon::today()->setTimeFromTimeString($masaMasukString . ':00'); // HH:mm
+
+        $noKenderaan = isset($validated['noKenderaan']) ? trim((string) $validated['noKenderaan']) : '';
+        $noKenderaan = $noKenderaan !== '' ? $noKenderaan : null;
 
         $pas = PasLawatan::create([
             'fld_pas_idPas' => PasLawatan::generatePasId(),
             'fld_pgw_idPengawal' => (string) $pengawalId,
             'fld_vis_id' => (string) $pelawat->fld_vis_id,
             'fld_pas_tujuan' => (string) $validated['tujuan'],
-            'fld_pas_noKenderaan' => (string) ($validated['noKenderaan'] ?? ''),
+            'fld_pas_noKenderaan' => $noKenderaan,
             'fld_pas_masaMasuk' => $masaMasuk,
             'fld_pas_masaKeluar' => null,
             'fld_pas_statusPas' => 'aktif',
