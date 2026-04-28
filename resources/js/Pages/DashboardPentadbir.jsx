@@ -426,7 +426,7 @@ export default function DashboardPentadbir({ kpi, dataPelawat, pelawatLihat, dat
                         <table className="w-full text-left text-sm text-gray-500">
                             <thead className="text-xs text-gray-400 uppercase bg-gray-50/50">
                                 <tr>
-                                    <th className="px-4 py-3 font-medium rounded-l-lg">ID Pas</th>
+                                    <th className="px-4 py-3 font-medium rounded-l-lg">ID Pelawat</th>
                                     <th className="px-4 py-3 font-medium">Nama Pelawat</th>
                                     <th className="px-4 py-3 font-medium">No. IC</th>
                                     <th className="px-4 py-3 font-medium">Tujuan</th>
@@ -443,7 +443,7 @@ export default function DashboardPentadbir({ kpi, dataPelawat, pelawatLihat, dat
                                             className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50"
                                         >
                                             <td className="px-4 py-4 font-medium text-gray-800 whitespace-nowrap">
-                                                {row.id_pas}
+                                                {row.id_pelawat}
                                             </td>
                                             <td className="px-4 py-4 text-gray-800">{row.nama_pelawat}</td>
                                             <td className="px-4 py-4 whitespace-nowrap">{row.no_ic}</td>

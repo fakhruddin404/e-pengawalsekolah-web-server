@@ -74,6 +74,7 @@ class DashboardController extends Controller
             ->map(function ($pas) {
                 return [
                     'id_pas' => $pas->fld_pas_idPas,
+                    'id_pelawat' => $pas->pelawat->fld_vis_id,
                     'nama_pelawat' => $pas->pelawat->fld_vis_namaPenuh ?? '—',
                     'no_ic' => $pas->pelawat->fld_vis_noIC ?? '—',
                     'tujuan' => $pas->fld_pas_tujuan,
