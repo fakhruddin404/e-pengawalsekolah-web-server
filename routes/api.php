@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutController;
+use App\Http\Controllers\Api\LocationPing\LocationPingController;
 use App\Http\Controllers\Api\Pelawat\PelawatController;
 use App\Http\Controllers\Api\PasLawatan\PasLawatanController;
 use App\Http\Controllers\Api\Pengawal\PengawalMediaController;
@@ -48,7 +49,8 @@ Route::prefix('pengawal')->group(function () {
     Route::middleware('auth:sanctum')->post('pas-lawatan', [PasLawatanController::class, 'store']);
 
     Route::middleware('auth:sanctum')->post('keluar-pas-lawatan/{id}', [PasLawatanController::class, 'keluar']);
-
+    
+    Route::middleware('auth:sanctum')->post('location-ping', [LocationPingController::class, 'store']);
 
 });
 

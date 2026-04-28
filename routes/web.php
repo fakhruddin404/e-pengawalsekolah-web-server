@@ -7,6 +7,7 @@ use App\Http\Controllers\PengawalController;
 use App\Http\Controllers\PentadbirController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TitikSemakController;
+use App\Http\Controllers\Api\LocationPing\LocationPingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -39,6 +40,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // dashboardRosak;
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/location-ping/latest', [LocationPingController::class, 'latest'])->name('location-ping.latest');
 
         // urus pengawal;
         Route::get('urus-pengawal', [PengawalController::class, 'index'])->name('pengawal.index');

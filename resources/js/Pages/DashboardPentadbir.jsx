@@ -20,7 +20,7 @@ import {
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Marker, Polyline } from 'react-leaflet';
 
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
@@ -67,6 +67,33 @@ export default function DashboardPentadbir({ kpi, dataPelawat, pelawatLihat, dat
         peratus: null,
         pathRoute: null,
     });
+
+    const [pengawalLocations, setPengawalLocations] = useState([]);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        async function loadLatest() {
+            try {
+                const res = await fetch(route('pentadbir.location-ping.latest'), {
+                    headers: { Accept: 'application/json' },
+                });
+                if (!res.ok) return;
+                const json = await res.json();
+                if (!cancelled) setPengawalLocations(Array.isArray(json) ? json : []);
+            } catch {
+                // ignore transient network errors
+            }
+        }
+
+        loadLatest();
+        const t = setInterval(loadLatest, 5000);
+
+        return () => {
+            cancelled = true;
+            clearInterval(t);
+        };
+    }, []);
 
     // Demo route (placeholder) – boleh sambung ke data sebenar bila siap
     const routeCenter = [3.07385, 101.60742];
@@ -289,6 +316,19 @@ export default function DashboardPentadbir({ kpi, dataPelawat, pelawatLihat, dat
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             />
+                            {pengawalLocations
+                                .map((p) => {
+                                    const lat = Number(p?.latitude);
+                                    const lng = Number(p?.longitude);
+                                    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+                                    return (
+                                        <Marker
+                                            key={p?.pengawal_id ?? `${lat},${lng}`}
+                                            position={[lat, lng]}
+                                        />
+                                    );
+                                })
+                                .filter(Boolean)}
                         </MapContainer>
                     </div>
                 </div>
