@@ -17,7 +17,7 @@ import {
     Legend,
 } from 'recharts';
 
-import { MapContainer, TileLayer } from 'react-leaflet';
+import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useEffect, useMemo, useState } from 'react';
@@ -33,6 +33,20 @@ L.Icon.Default.mergeOptions({
     iconUrl: iconUrl,
     shadowUrl: shadowUrl,
 });
+
+function FitToMarkers({ points, padding = 40, maxZoom = 17 }) {
+    const map = useMap();
+
+    useEffect(() => {
+        if (!map) return;
+        if (!Array.isArray(points) || points.length === 0) return;
+
+        const bounds = L.latLngBounds(points.map(([lat, lng]) => L.latLng(lat, lng)));
+        map.fitBounds(bounds, { padding: [padding, padding], maxZoom });
+    }, [map, points, padding, maxZoom]);
+
+    return null;
+}
 
 const statusPelawatLabel = {
     keluar: 'Keluar',
@@ -69,6 +83,17 @@ export default function DashboardPentadbir({ kpi, dataPelawat, pelawatLihat, dat
     });
 
     const [pengawalLocations, setPengawalLocations] = useState([]);
+    const pengawalMarkerPoints = useMemo(() => {
+        if (!Array.isArray(pengawalLocations)) return [];
+        return pengawalLocations
+            .map((p) => {
+                const lat = Number(p?.latitude);
+                const lng = Number(p?.longitude);
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+                return [lat, lng];
+            })
+            .filter(Boolean);
+    }, [pengawalLocations]);
 
     useEffect(() => {
         let cancelled = false;
@@ -316,6 +341,7 @@ export default function DashboardPentadbir({ kpi, dataPelawat, pelawatLihat, dat
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             />
+                            <FitToMarkers points={pengawalMarkerPoints} />
                             {pengawalLocations
                                 .map((p) => {
                                     const lat = Number(p?.latitude);
