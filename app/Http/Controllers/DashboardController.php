@@ -26,10 +26,10 @@ class DashboardController extends Controller
             'pengawal_aktif' => Pengawal::where('fld_pgw_status', 'aktif')->count(),
         ];
 
-        // 1. Data untuk Pelawat (Line Chart) — guna pilihan: minggu | bulan | tahun
+        // Data untuk Pelawat (Line Chart) — guna pilihan: minggu | bulan | tahun
         $dataPelawat = $this->dataPelawatBagiLihat($pelawatLihat);
 
-        // 2. Data untuk Rondaan (Bar Chart)
+        // Data untuk Rondaan (Bar Chart)
         $dataRondaan = [
             ['name' => 'Isn', 'jumlah' => 12],
             ['name' => 'Sel', 'jumlah' => 19],
@@ -40,14 +40,14 @@ class DashboardController extends Controller
             ['name' => 'Ahd', 'jumlah' => 9],
         ];
 
-        // 3. Data untuk Status Laporan (Donut Chart) — kiraan dari model LaporanKejadian
+        // Data untuk Status Laporan (Donut Chart) — kiraan dari model LaporanKejadian
         $dataStatusRPT = [
             ['name' => 'Baru', 'value' => $kpi['laporan_baru'] ?? 0],
             ['name' => 'Dalam Siasatan', 'value' => LaporanKejadian::where('fld_rpt_status', 'Dalam Siasatan')->count()],
             ['name' => 'Selesai', 'value' => LaporanKejadian::where('fld_rpt_status', 'Selesai')->count()],
         ];
 
-        //Data untuk jadual Rondaan (kepatuhan dari fld_sr_peratusTitikSemak pada model)
+        //Data untuk jadual Rondaan
         $senaraiRondaan = SesiRondaan::with('pengawal')
             ->latest()
             ->take(5)
@@ -84,7 +84,7 @@ class DashboardController extends Controller
                     'id_pengawal' => $pas->pengawal->fld_pgw_id ?? '—',
                 ];
             });
-
+        // hantar data ke view
         return Inertia::render('DashboardPentadbir', [
             'kpi' => $kpi,
             'dataPelawat' => $dataPelawat,
@@ -97,9 +97,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Graf lawatan: minggu = hari isnin–ahad minggu semasa, bulan = hari dalam bulan semasa, tahun = 12 bulan tahun semasa.
-     *
-     * @param  'minggu'|'bulan'|'tahun'  $lihat
+     * filter data pelawat berdasarkan minggu, bulan atau tahun
      */
     private function dataPelawatBagiLihat(string $lihat): array
     {

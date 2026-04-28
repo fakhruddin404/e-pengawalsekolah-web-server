@@ -13,9 +13,6 @@ use Inertia\Response;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
     public function edit(Request $request): Response
     {
         $user = $request->user();
@@ -48,9 +45,6 @@ class ProfileController extends Controller
         }
     }
 
-    /**
-     * Update the user's profile information.
-     */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
@@ -118,6 +112,7 @@ class ProfileController extends Controller
         $detailPentadbir = $user->pentadbirSekolah;
         $namaImej = null;
 
+        // imej handle
         if ($request->hasFile('fld_ps_urlGambarWajah')) {
             if ($detailPentadbir->fld_ps_urlGambarWajah) {
                 $pathGambarLama = public_path('pentadbirImej/'.$detailPentadbir->fld_ps_urlGambarWajah);

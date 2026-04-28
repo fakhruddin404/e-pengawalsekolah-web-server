@@ -1,7 +1,6 @@
 import PentadbirLayout from '@/Layouts/PentadbirLayout'; 
 import { Head, Link } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
-// Import Recharts
 import {
     LineChart,
     Line,
@@ -35,9 +34,7 @@ L.Icon.Default.mergeOptions({
     shadowUrl: shadowUrl,
 });
 
-// Letakkan props dari Controller di sini
 const statusPelawatLabel = {
-    aktif: 'Aktif',
     keluar: 'Keluar',
     ditolak: 'Ditolak',
     masuk: 'Masuk',
@@ -356,7 +353,7 @@ export default function DashboardPentadbir({ kpi, dataPelawat, pelawatLihat, dat
                     </div>
                 </div>
 
-                {/* 6. Senarai Pas Lawatan (Pelawat) */}
+                {/* Senarai Pas Lawatan */}
                 <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
                     <h3 className="text-[#0ea5e9] font-semibold mb-4">Senarai Pas Lawatan</h3>
                     <div className="overflow-x-auto">
@@ -421,7 +418,7 @@ export default function DashboardPentadbir({ kpi, dataPelawat, pelawatLihat, dat
 
             </div>
 
-            {/* Modal: Laluan Sesi Rondaan */}
+            {/* Route Display For SesiRondaan */}
             {routeModal.open && (
                 <div
                     className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4"
@@ -429,7 +426,7 @@ export default function DashboardPentadbir({ kpi, dataPelawat, pelawatLihat, dat
                     aria-modal="true"
                     aria-label="Laluan Sesi Rondaan"
                     onClick={() =>
-                        setRouteModal({
+                        setRouteDisplay({
                             open: false,
                             id_pengawal: null,
                             tarikh: null,
@@ -456,7 +453,7 @@ export default function DashboardPentadbir({ kpi, dataPelawat, pelawatLihat, dat
                                     type="button"
                                     className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
                                     onClick={() =>
-                                        setRouteModal({
+                                        setRouteDisplay({
                                             open: false,
                                             id_pengawal: null,
                                             tarikh: null,

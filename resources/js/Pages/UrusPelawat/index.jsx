@@ -10,11 +10,15 @@ const getStatusBadge = (isBlacklisted) => {
     }
 };
 
+// load data dari controller
 export default function Index({ auth, pelawats }) {
+    // State untuk Carian (Search)
     const [search, setSearch] = useState('');
+    // State untuk Tapisan (Filter)
     const [filterStatus, setFilterStatus] = useState('semua');
+    // State untuk Susunan (Sort)
     const [sortOrder, setSortOrder] = useState('asc');
-
+    // State untuk Pagination
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
@@ -28,6 +32,7 @@ export default function Index({ auth, pelawats }) {
         }
     };
 
+    // Process data for display(one by one)
     const processedPelawats = useMemo(() => {
         let result = pelawats;
 
@@ -58,6 +63,7 @@ export default function Index({ auth, pelawats }) {
         return result;
     }, [pelawats, search, filterStatus, sortOrder]);
 
+    // Reset pagination when search, filter, or sort changes
     useEffect(() => {
         setCurrentPage(1);
     }, [search, filterStatus, sortOrder]);
@@ -158,14 +164,11 @@ export default function Index({ auth, pelawats }) {
                                             </td>
                                             <td className="px-5 py-4">{visitor.fld_vis_noIC}</td>
                                             <td className="px-5 py-4">{visitor.fld_vis_noTelefon}</td>
-                                            
-                                            {/* 2. Pastikan td ini text-center dan flexbox digunakan di dalam getStatusBadge jika perlu */}
                                             <td className="px-5 py-4 text-center">
                                                 <div className="flex justify-center">
                                                     {getStatusBadge(visitor.fld_vis_statusSenaraiHitam)}
                                                 </div>
                                             </td>
-
                                             <td className="px-5 py-4 text-center">
                                                 <div className="flex items-center justify-center gap-2">
                                                     <Link

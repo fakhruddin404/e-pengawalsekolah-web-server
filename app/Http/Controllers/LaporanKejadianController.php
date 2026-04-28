@@ -19,15 +19,6 @@ class LaporanKejadianController extends Controller
         ]);
     }
 
-/*  public function show(LaporanKejadian $laporanKejadian)
-    {
-        $laporanKejadian->load(['pengawal.user']);
-
-        return Inertia::render('UrusLaporanKejadian/show', [
-            'laporanKejadian' => $laporanKejadian,
-        ]);
-    }*/
-
     public function edit(LaporanKejadian $laporanKejadian)
     {
         $laporanKejadian->load(['pengawal.user']);

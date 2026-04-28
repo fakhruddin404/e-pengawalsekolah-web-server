@@ -10,35 +10,24 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode; // Pastikan anda dah install pakej i
 
 class TitikSemakController extends Controller
 {
-    /**
-     * Paparkan senarai titik semak di halaman Index
-     */
     public function index()
     {
         $titikSemaks = LokasiTitikSemak::latest()->get();
-            
-        // Gunakan huruf kecil untuk selaras dengan nama fail index.jsx
+
         return Inertia::render('UrusTitikSemak/index', [ 
             'titikSemaks' => $titikSemaks
         ]);
     }
 
-    /**
-     * Paparkan borang tambah titik semak (CREATE)
-     */
     public function create()
     {
         $nextId = LokasiTitikSemak::generateLTSId();
-        
-        // Gunakan huruf kecil untuk selaras dengan nama fail create.jsx
+
         return Inertia::render('UrusTitikSemak/create', [
             'nextId' => $nextId
         ]);
     }
 
-    /**
-     * Simpan data titik semak ke dalam database (STORE)
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -55,16 +44,12 @@ class TitikSemakController extends Controller
         // Tukar status string ('aktif' / 'tidak_aktif') kepada boolean (1 / 0) untuk database
         $validated['fld_loc_status'] = $validated['fld_loc_status'] === 'aktif' ? 1 : 0;
 
-        // Simpan semua data ke database (termasuk status dan kod QR)
         LokasiTitikSemak::create($validated);
 
         return redirect()->route('pentadbir.titik-semak.index')
             ->with('success', 'Titik semak lokasi rondaan berjaya ditambah.');
     }
 
-    /**
-     * Padam data titik semak (DELETE)
-     */
     public function destroy($id)
     {
         // Cari data berdasarkan fld_loc_id dan padam
@@ -75,20 +60,16 @@ class TitikSemakController extends Controller
             ->with('success', 'Titik semak berjaya dipadam.');
     }
 
-    /**
-     * Paparkan view Cetak QR Code
-     */
     public function cetakQR($id)
     {
         $titikSemak = LokasiTitikSemak::findOrFail($id);
-        
-        // Data berbentuk JSON untuk dibaca oleh aplikasi mudah alih
+
         $qrData = json_encode([
             'id' => $titikSemak->fld_loc_id,
             'secret' => $titikSemak->fld_loc_kodQR
         ]);
 
-        // Jana imej QR berbentuk SVG (untuk dirender dengan cantik ketika print)
+        // Jana imej QR berbentuk SVG
         $qrSvg = (string) QrCode::format('svg')
                   ->size(300)
                   ->margin(0)
