@@ -23,7 +23,7 @@ class PengawalFactory extends Factory
             
             'fld_pgw_noTelefon' => '+601' . $this->faker->numerify('########'),
             'fld_pgw_noIC' => $this->faker->numerify('######-##-####'),
-            'fld_pgw_status' => 'aktif',
+            'fld_pgw_status' => 'tidak_aktif',
             'fld_pgw_statusSemasa' => 'tidak_bertugas',
             'fld_pgw_urlGambarWajah' => null,
         ];
