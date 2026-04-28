@@ -67,7 +67,6 @@ class LocationPingController extends Controller
         // We still query pengawals table to know which pengawal to show.
         $pengawals = Pengawal::query()
             ->where('fld_pgw_status', 'aktif')
-            ->where('fld_pgw_statusSemasa', 'bertugas')
             ->orderBy('fld_pgw_id')
             ->limit($limit)
             ->get(['fld_pgw_id']);

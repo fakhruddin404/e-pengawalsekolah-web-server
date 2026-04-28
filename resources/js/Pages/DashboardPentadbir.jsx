@@ -466,7 +466,7 @@ export default function DashboardPentadbir({ kpi, dataPelawat, pelawatLihat, dat
                     aria-modal="true"
                     aria-label="Laluan Sesi Rondaan"
                     onClick={() =>
-                        setRouteDisplay({
+                        setRouteModal({
                             open: false,
                             id_pengawal: null,
                             tarikh: null,
@@ -493,7 +493,7 @@ export default function DashboardPentadbir({ kpi, dataPelawat, pelawatLihat, dat
                                     type="button"
                                     className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
                                     onClick={() =>
-                                        setRouteDisplay({
+                                        setRouteModal({
                                             open: false,
                                             id_pengawal: null,
                                             tarikh: null,
